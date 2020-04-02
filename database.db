@@ -1,0 +1,24 @@
+{
+    "1": {
+        "id": "1",
+        "password": "2",
+        "user": "Brandon",
+        "mail": {
+            "1": {
+                "from": "fulano",
+                "title": "naoabra",
+                "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, ; sed do eiusmod tempor"
+            },
+            "2": {
+                "from": "software",
+                "title": "leiame",
+                "body": "xq"
+            },
+            "a": {
+                "from": "James H. Miller",
+                "title": "Contrato n22",
+                "body": "Setor: X11.  Objetivo: Levantamento sismico.  Acordo: 22 MCr."
+            }
+        }
+    }
+}
