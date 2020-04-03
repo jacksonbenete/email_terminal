@@ -1,21 +1,34 @@
+/**
+ * This is only used in the formatColums function, that have never been implemented.
+ * 
+ * @todo Marked to be removed.
+ */
 var util = util || {};
 util.toArray = function(list) {
   return Array.prototype.slice.call(list || [], 0);
 };
 
+
+// Global scope variables
 date = new Date()
-
-
 var serverName;
 var database;
 var database_mail;
-
 var iconName;
 var terminalID;
 var prompt_text;
 var header;
 let logged = false
 
+/**
+ * Internal logic of terminal.
+ * 
+ * Base code created by @AndrewBarfield, further development by @jacksonbenete. 
+ * This should contain all the basic code for the terminal behavior.
+ * 
+ * @param {Container} cmdLineContainer  The div where the user will write into
+ * @param {Container} outputContainer   The div where the terminal will return information at
+ */
 var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
   window.URL = window.URL || window.webkitURL;
   window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
@@ -23,6 +36,7 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
   var cmdLine_ = document.querySelector(cmdLineContainer);
   var output_ = document.querySelector(outputContainer);
 
+  // A list of terminal implemented functions (to show in help)
   const CMDS_ = [
     'clear', 'date', 'echo', 'help', 'mail', 'read'
   ];
@@ -33,20 +47,31 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
   var histpos_ = 0;
   var histtemp_ = 0;
 
+  // Recover focus on terminal
   window.addEventListener('click', function(e) {
     cmdLine_.focus();
   }, false);
 
-  cmdLine_.addEventListener('click', inputTextClick_, false);
   cmdLine_.addEventListener('keydown', historyHandler_, false);
   cmdLine_.addEventListener('keydown', processNewCommand_, false);
-
-  //
+  
+  /**
+   * @todo I don't think this is necessary, marked to be removed
+   */
+  cmdLine_.addEventListener('click', inputTextClick_, false);
   function inputTextClick_(e) {
     this.value = this.value;
   }
 
-  //
+  /**
+   * A function for a `history` function implementation.
+   * 
+   * You can navigate by pressing the up and down arrow for see or repeat previous commands.
+   * 
+   * @todo I don't get why the "Up arrow" aren't setting the cursor to end of input
+   * 
+   * @param {Event} e 
+   */
   function historyHandler_(e) {
     if (history_.length) {
       if (e.keyCode == 38 || e.keyCode == 40) {
@@ -57,13 +82,19 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
         }
       }
 
-      if (e.keyCode == 38) { // up
+      // Up arrow
+      if (e.keyCode == 38) {
         histpos_--;
         if (histpos_ < 0) {
           histpos_ = 0;
         }
-      } else if (e.keyCode == 40) { // down
+      }
+
+      // Down arrow
+      else if (e.keyCode == 40) {
         histpos_++;
+
+        // This avoid to repeat the history from the beggining
         if (histpos_ > history_.length) {
           histpos_ = history_.length;
         }
@@ -76,7 +107,15 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
     }
   }
 
-  //
+  /**
+   * The main function to process commands.
+   * 
+   * This is a switch-case to deal with the internal logic.
+   * 
+   * @todo This should be modulated to accept external .js files commands.
+   * 
+   * @param {Event} e 
+   */
   function processNewCommand_(e) {
 
     if (e.keyCode == 9) { // tab
@@ -210,7 +249,14 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
     }
   }
 
-  //
+  /**
+   * This function isn't used in the code and I don't know what the original author would want to use it for.
+   * Maybe, it's for a never implemented `ls` function to list directory files and details.
+   * 
+   * @todo Marked to be removed
+   * 
+   * @param {?} entries 
+   */
   function formatColumns_(entries) {
     var maxName = entries[0].name;
     util.toArray(entries).forEach(function(entry, i) {
@@ -229,12 +275,20 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
             colWidth, 'px;', height, '">'];
   }
 
-  //
+  /**
+   * A function to padronize every output/return as a terminal print/echo function
+   * 
+   * @param {String} html The string to be returned as a print in terminal
+   */
   function output(html) {
     output_.insertAdjacentHTML('beforeEnd', '<p>' + html + '</p>');
   }
 
-  // Cross-browser impl to get document's height.
+  /**
+   * Cross-browser impl to get document's height.
+   * 
+   * This function is necessary to auto-scroll to the end of page after each terminal command.
+   */
   function getDocHeight_() {
     var d = document;
     return Math.max(
@@ -244,8 +298,9 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
     );
   }
 
-  //
-
+  /**
+   * This will automatically output the hearder when the object initialize (constructor?).
+   */
   return {
     init: function() {
       output(header);
@@ -254,14 +309,17 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
   }
 };
 
+/**
+ * The `Document.ready` function to initialize everything.
+ */
 $(function() {
-  
-  
+
   $.ajax({
     url:"config/conf.json",
     dataType:"text",
     success:function(data)
     {
+      // Data recovery
       conf = JSON.parse(data)
       newYear = conf.year
       terminalID = conf.terminalID
@@ -272,27 +330,27 @@ $(function() {
       date_final = date.getDay() + '/' + date.getMonth() + '/' + newYear
       var prompt_text;
 
+      // Setting correct header icon and terminal name
       if (conf.randomSeed) {
         prompt_text = '[' + defaultUser + date.getTime() + '@' + terminalID + '] # '
       }
       else {
         prompt_text = '[' + defaultUser  + '@' + terminalID + '] # '
       }
-      
       header = `
       <img align="left" src="icon/` + iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
       <h2 style="letter-spacing: 4px">` + serverName + `</h2>
       <p>Logged in: ` + date.setFullYear(newYear) + ` ( ` + date_final + ` ) </p>
       <p>Enter "help" for more information.</p>
       `
-      // Set the command-line prompt to include the user's IP Address
-        $('.prompt').html(prompt_text);
-      // Initialize a new terminal object
+      $('.prompt').html(prompt_text);
+      
+      // Initializing Terminal Object
       var term = new Terminal('#input-line .cmdline', '#container output');
       term.init();
+
     }
   });
-  
 });
 
 
