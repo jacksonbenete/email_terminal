@@ -1,23 +1,23 @@
 {
     "1": {
-        "id": "1",
-        "password": "2",
-        "user": "Brandon",
+        "id": "8A73B5",
+        "password": "trustno1",
+        "user": "Mulder, Fox",
         "mail": {
             "1": {
-                "from": "fulano",
-                "title": "naoabra",
-                "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, ; sed do eiusmod tempor"
+                "from": "Traveller",
+                "title": "Do not Open",
+                "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."
             },
             "2": {
-                "from": "software",
-                "title": "leiame",
-                "body": "xq"
+                "from": "Software",
+                "title": "undefined",
+                "body": "001100101 011000101 0110 10 01001 01 01110 1001010101"
             },
             "a": {
-                "from": "James H. Miller",
+                "from": "Josephus A. Miller",
                 "title": "Contrato n22",
-                "body": "Setor: X11.  Objetivo: Levantamento sismico.  Acordo: 22 MCr."
+                "body": "Sector: X11.  Objective: Investigate the sewers and report only to me.  Reward: 22 MCr."
             }
         }
     }

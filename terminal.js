@@ -1,38 +1,20 @@
-const CSV = (data, delimiter = ",", omitFirstRow = false) =>
-    data
-        .slice(omitFirstRow ? data.indexOf("\n") + 1 : 0)
-        .split("\n")
-        .map(v => v.split(delimiter));
- 
-
-
 var util = util || {};
 util.toArray = function(list) {
   return Array.prototype.slice.call(list || [], 0);
 };
 
-newYear = 2377
 date = new Date()
-date_final = date.getDay() + '/' + date.getMonth() + '/' + newYear
 
-let serverName = "Node Y56 Intranet"
+
+var serverName;
 var database;
 var database_mail;
 
-let iconName = 'Moon-icon.png'
-// let iconName = 'tech.jpg'
-let terminalID = 'Y56'
-let prompt_text = '[anonimous' + date.getTime() + '@' + terminalID + '] # '
+var iconName;
+var terminalID;
+var prompt_text;
+var header;
 let logged = false
-
-
-header = `
-<img align="left" src="./` + iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
-<h2 style="letter-spacing: 4px">` + serverName + `</h2>
-<p>Logged in: ` + date.setFullYear(newYear) + ` ( ` + date_final + ` ) </p>
-<p>Enter "help" for more information.</p>
-`
-
 
 var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
   window.URL = window.URL || window.webkitURL;
@@ -42,7 +24,7 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
   var output_ = document.querySelector(outputContainer);
 
   const CMDS_ = [
-    'cat', 'clear', 'date', 'echo', 'help', 'mail', 'read'
+    'clear', 'date', 'echo', 'help', 'mail', 'read'
   ];
   
   var fs_ = null;
@@ -125,20 +107,6 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
       }
 
       switch (cmd) {
-        case 'cat':
-          var url = args.join(' ');
-          if (!url) {
-            output('Usage: ' + cmd + ' https://s.codepen.io/...');
-            output('Example: ' + cmd + ' https://s.codepen.io/AndrewBarfield/pen/LEbPJx.js');
-            break;
-          }
-          $.get( url, function(data) {
-            var encodedStr = data.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
-               return '&#'+i.charCodeAt(0)+';';
-            });
-            output('<pre>' + encodedStr + '</pre>');
-          });          
-          break;
         case 'clear':
           output_.innerHTML = '';
           this.value = '';
@@ -164,7 +132,6 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
                 dataType:"text",
                 success:function(data)
                 {
-                    // database = CSV(data)
                     database = JSON.parse(data)
                     regexp = /^[0-9a-fA-F]+$/;
                     try {
@@ -285,12 +252,42 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
 
 $(function() {
   
-  // Set the command-line prompt to include the user's IP Address
-    $('.prompt').html(prompt_text);
+  
+  $.ajax({
+    url:"conf.json",
+    dataType:"text",
+    success:function(data)
+    {
+      conf = JSON.parse(data)
+      newYear = conf.year
+      terminalID = conf.terminalID
+      iconName = conf.iconName
+      serverName = conf.serverName
+      defaultUser = conf.defaultUser
+      
+      date_final = date.getDay() + '/' + date.getMonth() + '/' + newYear
+      var prompt_text;
 
-  // Initialize a new terminal object
-  var term = new Terminal('#input-line .cmdline', '#container output');
-  term.init();
+      if (conf.randomSeed) {
+        prompt_text = '[' + defaultUser + date.getTime() + '@' + terminalID + '] # '
+      }
+      else {
+        prompt_text = '[' + defaultUser  + '@' + terminalID + '] # '
+      }
+      
+      header = `
+      <img align="left" src="./` + iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
+      <h2 style="letter-spacing: 4px">` + serverName + `</h2>
+      <p>Logged in: ` + date.setFullYear(newYear) + ` ( ` + date_final + ` ) </p>
+      <p>Enter "help" for more information.</p>
+      `
+      // Set the command-line prompt to include the user's IP Address
+        $('.prompt').html(prompt_text);
+      // Initialize a new terminal object
+      var term = new Terminal('#input-line .cmdline', '#container output');
+      term.init();
+    }
+  });
   
 });
 
