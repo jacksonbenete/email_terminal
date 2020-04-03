@@ -179,9 +179,10 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
                 output(`You need to login`)
                 break;
             }
-
+            readOption = false
             $.each(database_mail, function(index, mail){
                 if (args[0] == index) {
+                    readOption = true
                     output(`---------------------------------------------`)
                     output(`From: ` + mail.from)
                     output(`To: ` + database.id + `@` + terminalID)
@@ -194,6 +195,9 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
                 
             })
 
+            if (!readOption) {
+              output(`Invalid message key`)
+            }
             break;
         default:
           if (cmd) {

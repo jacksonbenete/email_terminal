@@ -71,7 +71,7 @@ key -> id, password, user, mail.
 - mail: a array containing the following (key -> from, title, body)
 - - from: who send the message
 - - title: what you will see when listing the messages at terminal
-- - body: the actual message
+- - body: the actual message. You can break line by entering a double space '  '.
 
 The first key in the root doesn't matter since you'll be using the `id` field for the username (in the example bellow I've user a simple "1" for the first character), so if you want you can name it as the character name or the player name, but the key in the mail will be used to access the correct message with the `read` command function.
 
@@ -89,7 +89,7 @@ You can register as many users and mail messages as you want, you just need to p
             "1": {
                 "from": "Traveller",
                 "title": "Do not Open",
-                "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."
+                "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
             },
             "2": {
                 "from": "Software",
@@ -120,6 +120,10 @@ Note the change in the terminal username
 How to list and read mails
 
 ![Mail and Read functions.](img/mail_n_read.png)
+
+### Other Functions
+
+You can try `help` to see a list of other functions disponible. The `clear` function may be a good one.
 
 ## How to Install
 
