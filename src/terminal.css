@@ -76,31 +76,4 @@ body {
   column-width: 100px;
 }
 
-
-/************************************************************/
-/* SVG Clock                                                */
-/************************************************************/
-
-.clock-container {
-  display: none /*inline-block*/;
-  position: relative;
-  width: 200px;
-  vertical-align: middle;
-  overflow: hidden;
-} 
-
-.clock-container > svg > circle {
-  stroke-width: 2px;
-  stroke: #fff;
-}
-
-.hour, .min, .sec { 
-  stroke-width: 1px;
-  fill: #333;
-  stroke: #555;
-}
-
-.sec {
-   stroke: #f55;
-}
-
+/* Extra Configurations */

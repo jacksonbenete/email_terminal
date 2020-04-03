@@ -128,7 +128,7 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
 
           case 'login':
             $.ajax({
-                url:"database.db",
+                url:"config/database.db",
                 dataType:"text",
                 success:function(data)
                 {
@@ -258,7 +258,7 @@ $(function() {
   
   
   $.ajax({
-    url:"conf.json",
+    url:"config/conf.json",
     dataType:"text",
     success:function(data)
     {
@@ -280,7 +280,7 @@ $(function() {
       }
       
       header = `
-      <img align="left" src="./` + iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
+      <img align="left" src="icon/` + iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
       <h2 style="letter-spacing: 4px">` + serverName + `</h2>
       <p>Logged in: ` + date.setFullYear(newYear) + ` ( ` + date_final + ` ) </p>
       <p>Enter "help" for more information.</p>

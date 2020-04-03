@@ -1,6 +1,6 @@
 # Email Reader Terminal for tabletop RPGs
 
-![Email Terminal Gif](img/email_terminal.gif)
+![Email Terminal Gif](docs/email_terminal.gif)
 
 This is a simple, read-only, terminal experience for tabletop RPGs.
 You can fork the project and change the code for your own configurations, like terminal name (or sector/station/node if sci-fi), image and messages.
@@ -13,7 +13,7 @@ You can host it on github pages for a free and fast experience and can share the
 
 The code may be a mess. 
 
-That's because I may be supposedly improving it, and since I'm not a Software Developer anymore (as a professional), I don't care too much for organization, specially because I code just for fun nowadays.
+That's because I may be supposedly improving it.
 
 ## How to Configure
 
@@ -25,7 +25,7 @@ You will find instructions for both options below.
 The basic configuration is what you need to change for customize your terminal.
 You can change the terminal year date, the server name, a customized icon, the terminal identification (this is what is written just before of the mouse cursor), as well as the default user name (normally will be "user", but can be whatever you want) and if you want a random number to be displayed right in front of the default username. Note however that once you login to the server the username will change.
 
-You will want to customize the terminal depending of the game setting you're playing. You just have to edit the `conf.json` file.
+You will want to customize the terminal depending of the game setting you're playing. You just have to edit the `conf.json` file. Both `conf.json` and `database.db` customization files are in the config folder.
 
 ```json
 {
@@ -38,7 +38,7 @@ You will want to customize the terminal depending of the game setting you're pla
 }
 ```
 ---
-![Example of a Sci-Fi / Space Opera Terminal](img/scifi_example.png)
+![Example of a Sci-Fi / Space Opera Terminal](docs/scifi_example.png)
 
 ```json
 {
@@ -51,7 +51,7 @@ You will want to customize the terminal depending of the game setting you're pla
 }
 ```
 ---
-![Example of a Sci-Fi / Space Opera Terminal](img/fbi_example.png)
+![Example of a Sci-Fi / Space Opera Terminal](docs/fbi_example.png)
 
 ### Login, Mail & Read Functions
 
@@ -109,17 +109,17 @@ You can register as many users and mail messages as you want, you just need to p
 
 To login you need to enter user@password
 
-![How to login.](img/login1.png)
+![How to login.](docs/login1.png)
 ---
 
 Note the change in the terminal username
 
-![Note the change in the terminal username.](img/login2.png)
+![Note the change in the terminal username.](docs/login2.png)
 ---
 
 How to list and read mails
 
-![Mail and Read functions.](img/mail_n_read.png)
+![Mail and Read functions.](docs/mail_n_read.png)
 
 ### Other Functions
 
@@ -130,13 +130,13 @@ You can try `help` to see a list of other functions disponible. The `clear` func
 As I've said, you can use Github Pages to do that for you.
 If you're not used to Github, first create a github user by registering in [Github](github.com), so you can "fork" the project to your account by accessing the project page [email_terminal](github.com/jacksonbenete/email_terminal) and by clicking in the "fork" button.
 
-![How to Fork a project.](img/fork1.png)
+![How to Fork a project.](docs/fork1.png)
 
 Note that those two in red are the only two steps you need to take to put your terminal up and running. You need to click the Fork button, and after some seconds, the project will be there as one of your own repositories, and then you will click in the Settings button.
 
 In the settings page, you will roll until Github Pages and will select the source as the master branch. 
 
-![Github Pages on Settings.](img/fork2.png)
+![Github Pages on Settings.](docs/fork2.png)
 
 After some seconds, you will be able to access your terminal at username.github.io/email_terminal (i.e. jacksonbenete.github.io/email_terminal).
 
@@ -169,4 +169,5 @@ If you want to, drop some ideas into my github repository or send me some messag
 - Moon icon by: http://www.iconarchive.com/show/christmas-shadow-2-icons-by-pelfusion/Moon-icon.html and www.pelfusion.com
 - Tech icon by: https://favpng.com/png_user/GreatCthulhu
 - CMD icon by: https://www.flaticon.com/br/packs/seo-and-web-5
+- Vision icon by: https://www.flaticon.com/free-icon/company-vision_1465429
 - (non-free) DNA icon by: https://www.iconfinder.com/icons/378473/dna_icon 
