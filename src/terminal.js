@@ -8,6 +8,10 @@ util.toArray = function(list) {
   return Array.prototype.slice.call(list || [], 0);
 };
 
+// function CommandNotFoundError(cmd) {
+//   return new Error (cmd + ': command not found');
+// }
+
 
 // Global scope variables
 date = new Date()
@@ -29,18 +33,10 @@ let logged = false
  * @param {Container} cmdLineContainer  The div where the user will write into
  * @param {Container} outputContainer   The div where the terminal will return information at
  */
-var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
+var Terminal = Terminal || function() {
   window.URL = window.URL || window.webkitURL;
   window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
 
-  var cmdLine_ = document.querySelector(cmdLineContainer);
-  var output_ = document.querySelector(outputContainer);
-
-  // A list of terminal implemented functions (to show in help)
-  const CMDS_ = [
-    'clear', 'date', 'echo', 'help', 'mail', 'read'
-  ];
-  
   var fs_ = null;
   var cwd_ = null;
   var history_ = [];
@@ -112,8 +108,6 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
    * 
    * This is a switch-case to deal with the internal logic.
    * 
-   * @todo This should be modulated to accept external .js files commands.
-   * 
    * @param {Event} e 
    */
   function processNewCommand_(e) {
@@ -137,6 +131,7 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
       input.readOnly = true;
       output_.appendChild(line);
 
+      // Parsing Terminal arguments as `args`
       if (this.value && this.value.trim()) {
         var args = this.value.split(' ').filter(function(val, i) {
           return val;
@@ -145,107 +140,61 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
         args = args.splice(1); // Remove cmd from arg list.
       }
 
-      switch (cmd) {
-        case 'clear':
-          output_.innerHTML = '';
-          this.value = '';
-          return;
-        case 'date':
-          output( date );
-          break;
-        case 'echo':
-          output( args.join(' ') );
-          break;
-        case 'help':
-          output('<div class="ls-files">' + CMDS_.join('<br>') + '</div>');
-          break;
-        case 'exit':
-        case 'logout':
-            logged = false
-            window.close()
-          break;
 
-          case 'login':
-            $.ajax({
-                url:"config/database.db",
-                dataType:"text",
-                success:function(data)
-                {
-                    database = JSON.parse(data)
-                    regexp = /^[0-9a-fA-F]+$/;
-                    try {
-                        args = args[0].split('@')
-                        $.each(database, function(index, value){
-                            if (args[0] == value.id && args[1] == value.password){
-                                logged = value.id;
-                                database = value;
-                                database_mail = value.mail;
-                                output_.innerHTML = '';
-                                output(header)
-                                output('Login successful')
-                                prompt_text = '[' + value.user + '@' + terminalID + '] > '
-                                $('.prompt').html(prompt_text);
-                            }
-                        })
-                    } catch (error) {
-                        // output(`This isn't a valid ID.`);
-                        // output(`Try: login id@pass`);
-                    }
-                    finally{
-                        if(!logged){
-                            output(`This isn't a valid ID.`);
-                            output(`Try: login id@pass`);
-                        }
-                    }
-                }
-            });
-          break;
-        
-          case 'mail':
-            if (!logged){
-                output(`You need to login`)
-                break;
-            }
+      /**
+       * The kernel function is at src/softwares.js
+       * 
+       * If need to know more about Promises, read the following:
+       * https://stackoverflow.com/questions/14220321/how-do-i-return-the-response-from-an-asynchronous-call
+       */
+      try {
+        // If the user enter a empty line, it will just ignore and output a new line in finally
+        if (cmd != undefined) {
 
-            $.each(database_mail, function(index, mail){
-                output(`[` + index + `] ` + mail.title)
+          kernel(cmd, args)
+            .then(function(res){
+              if (typeof(res) == 'object'){
+
+                $.each(res, function(index, value) {
+                  output(value)
+                })
+
+              }
+  
+              if (typeof(res) == 'string'){
+                output(res)
+              }
+  
+              window.scrollTo(0, getDocHeight_());
+              this.value = ''; // Clear/setup line for next input.
             })
-
-            break;
-
-          case 'read':
-            if (!logged){
-                output(`You need to login`)
-                break;
-            }
-            readOption = false
-            $.each(database_mail, function(index, mail){
-                if (args[0] == index) {
-                    readOption = true
-                    output(`---------------------------------------------`)
-                    output(`From: ` + mail.from)
-                    output(`To: ` + database.id + `@` + terminalID)
-                    output(`---------------------------------------------`)
-                    
-                    $.each(mail.body.split("  "), function(i, b){
-                        output(b)
-                    })
-                }
-                
+            .catch(function(e) {
+              // throw new CommandNotFoundError(e, metadata)
+              output(e + ': command not found')
             })
-
-            if (!readOption) {
-              output(`Invalid message key`)
-            }
-            break;
-        default:
-          if (cmd) {
-            output(cmd + ': command not found');
-          }
-      };
-
-      window.scrollTo(0, getDocHeight_());
-      this.value = ''; // Clear/setup line for next input.
+        }
+  
+      } catch (error) {
+        // if (error instanceof CommandNotFoundError) {
+        //   output(error.message);
+        //   console.log(error.metadata)
+        // }
+        if (error instanceof TypeError) {
+          output(cmd + ': command not found');
+        }
+        else {
+          output(error)
+          console.log(error)
+          console.log(error.metadata)
+        }
+  
+      } finally {
+  
+        window.scrollTo(0, getDocHeight_());
+        this.value = ''; // Clear/setup line for next input.
+  
+      }
+      
     }
   }
 
@@ -275,14 +224,14 @@ var Terminal = Terminal || function(cmdLineContainer, outputContainer) {
             colWidth, 'px;', height, '">'];
   }
 
-  /**
-   * A function to padronize every output/return as a terminal print/echo function
-   * 
-   * @param {String} html The string to be returned as a print in terminal
-   */
-  function output(html) {
-    output_.insertAdjacentHTML('beforeEnd', '<p>' + html + '</p>');
-  }
+  // /**
+  //  * A function to padronize every output/return as a terminal print/echo function
+  //  * 
+  //  * @param {String} html The string to be returned as a print in terminal
+  //  */
+  // function output(html) {
+  //   output_.insertAdjacentHTML('beforeEnd', '<p>' + html + '</p>');
+  // }
 
   /**
    * Cross-browser impl to get document's height.
@@ -346,7 +295,8 @@ $(function() {
       $('.prompt').html(prompt_text);
       
       // Initializing Terminal Object
-      var term = new Terminal('#input-line .cmdline', '#container output');
+      kernel.init('#input-line .cmdline', '#container output', date);
+      var term = new Terminal();
       term.init();
 
     }
