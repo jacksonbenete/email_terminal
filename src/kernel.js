@@ -123,17 +123,8 @@ kernel.init = function(cmdLineContainer, outputContainer, definedDate) {
 			'clear', 'date', 'echo', 'help', 'login', 'mail', 'read', 'ping', 'telnet'
 		]
 
-		$.when(
-			$.get('config/network/' + serverDatabase.serverAddress + '/userlist.json', function(list) {
-				userList = list
-			}),
-			$.get('config/network.json', function(networkList) {
-				networkDatabase = networkList
-			}),
-			$.get('config/software.json', function(softwareList) {
-				softwareDatabase = softwareList
-			})
-		).then(function() {
+		$.get('config/network/' + serverDatabase.serverAddress + '/userlist.json', function(list) {
+			userList = list
 			resolve(true)
 		})
 	})
@@ -346,16 +337,12 @@ var system = {
 			if (args == "")
 				throw new AddressIsEmptyError
 
-			serverFound = false
-			$.each(networkDatabase, function(index, value) {
-				if (value.serverAddress == args) {
-					serverFound = true
-					resolve(`Server ` + value.serverAddress + ` (` + value.serverName + `) can be reached`)
-				}
+			$.get('config/network/' + args + '/manifest.json', function(serverInfo) {
+				resolve(`Server ` + serverInfo.serverAddress + ` (` + serverInfo.serverName + `) can be reached`)
 			})
-
-			if (!serverFound)
-				throw new AddressNotFoundError(args)
+			.fail(function(){
+				reject(new AddressNotFoundError(args))
+			})
 		})
 	},
 
@@ -364,22 +351,22 @@ var system = {
 			if (args == "")
 				throw new AddressIsEmptyError
 
-			serverFound = false
-			$.each(networkDatabase, function(index, value) {
-				if (value.serverAddress == args) {
-					serverFound = true
-					logged = false // Lost email access if previous login
-					serverDatabase = value
-					userDatabase = serverDatabase.defaultUser
-					userList = serverDatabase.userList
-					// serverFiles = value.serverFiles
-
-					resolve(setHeader('Connection successful'))
-				}
+			if (args == serverDatabase.serverAddress)
+				throw new AddressDuplicatedError(args)
+			
+			$.get('config/network/' + args + '/manifest.json', function(serverInfo) {
+				logged = true
+				serverDatabase = serverInfo
+				resolve(setHeader('Connection successful'))
 			})
-
-			if (!serverFound)
-				throw new AddressNotFoundError(args)
+			.done(function(){
+				$.get('config/network/' + serverDatabase.serverAddress + '/userlist.json', function(list) {
+					userList = list
+				})
+			})
+			.fail(function(){
+				reject(new AddressNotFoundError(args))
+			})
 		})
 	}
 }
@@ -391,15 +378,17 @@ var software = function(app, args) {
 		appFiletype = app.split('.')[1]
 
 		$.get('config/software/' + appName + '.json', function(softwareInfo) {
-				console.log(softwareInfo)
+
 				if (
 					appFiletype == softwareInfo[appName].filetype &&
 					softwareInfo[appName].location.includes(serverDatabase.serverAddress) &&
 					softwareInfo[appName].protection.includes(userDatabase.userId)
 				)
 					resolve(softwareInfo[appName].message)
+				
 				else
 					reject(new CommandNotFoundError(app))
+				
 			})
 			.fail(function() {
 				reject(new CommandNotFoundError(app))

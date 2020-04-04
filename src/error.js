@@ -40,3 +40,17 @@ class LoginIsFalseError extends Error {
         this.message = (`You are not logged in.`)
     }
 }
+
+class InvalidMessageKeyError extends Error {
+    constructor(message) {
+        super(message)
+        this.message = (`Invalid message key.`)
+    }
+}
+
+class AddressDuplicatedError extends Error {
+    constructor(message) {
+        super(message)
+        this.message = (`You already is at ` + message + `.`)
+    }
+}
