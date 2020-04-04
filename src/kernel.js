@@ -323,8 +323,9 @@ var system = {
 
 			var messageList = []
 
-			$.each(userDatabase.mail, function(index, mail) {
-				messageList.push(`[` + index + `] ` + mail.title)
+			$.each(mailList, function(index, mail) {
+				if (mail.to.includes(userDatabase.userId))
+					messageList.push(`[` + index + `] ` + mail.title)
 			})
 
 			if (messageList == "")
@@ -339,27 +340,27 @@ var system = {
 			if (!logged)
 				throw new LoginIsFalseError
 
-			var ans = []
+			var message = []
 
 			readOption = false
-			$.each(userDatabase.mail, function(index, mail) {
-				if (args[0] == index) {
+			$.each(mailList, function(index, mail) {
+				if (mail.to.includes(userDatabase.userId) && args[0] == index) {
 					readOption = true
-					ans.push(`---------------------------------------------`)
-					ans.push(`From: ` + mail.from)
-					ans.push(`To: ` + userDatabase.userId + `@` + serverDatabase.terminalID)
-					ans.push(`---------------------------------------------`)
+					message.push(`---------------------------------------------`)
+					message.push(`From: ` + mail.from)
+					message.push(`To: ` + userDatabase.userId + `@` + serverDatabase.terminalID)
+					message.push(`---------------------------------------------`)
 
 					$.each(mail.body.split("  "), function(i, b) {
-						ans.push(b)
+						message.push(b)
 					})
 				}
 			})
 
 			if (!readOption)
-				ans.push(`Invalid message key`)
+				reject(new InvalidMessageKeyError)
 
-			resolve(ans)
+			resolve(message)
 		})
 	},
 
