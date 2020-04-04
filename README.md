@@ -9,27 +9,46 @@ The database is a simple JSON structured file.
 
 You can host it on github pages for a free and fast experience and can share the link for your friends and players to use.
 
-## First Considerations
+## Latest News
 
-The code may be a mess. 
+You can now configure and access extra servers at network.json to login via telnet.
+Each server will treat their respective users (and mail messages) separatedly.
 
-That's because I may be supposedly improving it.
+---
+![Telnet v1](docs/telnet.gif)
+
+You can now configure custom software at software.json to use it.
+They're just simple simulations but I hope you enjoy it!
+
+---
+![Custom Software v1](docs/custom_software.gif)
+
+The help command has been improved.
+You can now show further help instructions for internal commands.
+
+---
+![Help v1](docs/help.gif)
 
 ## How to Configure
 
 You can upload it to Github Pages or try it on your computer. 
 You will find instructions for both options below.
 
-### Customization
+## Customization
+
+You will want to customize the terminal depending of the game setting you're playing. You just have to edit the `conf.json` file. Both `conf.json` and `database.json` customization files are in the config folder.
+
+More configuration files will be added when more functionality shows up.
+
+### conf.json
 
 The basic configuration is what you need to change for customize your terminal.
 You can change the terminal year date, the server name, a customized icon, the terminal identification (this is what is written just before of the mouse cursor), as well as the default user name (normally will be "user", but can be whatever you want) and if you want a random number to be displayed right in front of the default username. Note however that once you login to the server the username will change.
 
-You will want to customize the terminal depending of the game setting you're playing. You just have to edit the `conf.json` file. Both `conf.json` and `database.db` customization files are in the config folder.
-
 ```json
 {
     "year": "2377",
+    "serverAddress": "127.0.0.1",
     "serverName": "Node Y56 Intranet",
     "iconName": "Moon-icon.png",
     "terminalID": "Y56",
@@ -43,6 +62,7 @@ You will want to customize the terminal depending of the game setting you're pla
 ```json
 {
     "year": "1972",
+    "serverAddress": "127.0.0.1",
     "serverName": "FBI: X-Files Division",
     "iconName": "fbi.png",
     "terminalID": "fbi",
@@ -53,21 +73,15 @@ You will want to customize the terminal depending of the game setting you're pla
 ---
 ![Example of a Sci-Fi / Space Opera Terminal](docs/fbi_example.png)
 
-### Login, Mail & Read Functions
+### database.json
 
-The main functions (at least right now) is the `mail` and `read` terminal operations.
-
-Once you `login`, you can write down the `mail` function to list the user emails and you can `read` those mails you want by entering the index code (a number, a letter, or a string). 
-
-As a simple terminal emulation, you can't delete mails or mark as read. We maybe can work it out in the future, but those basic functions are enough to send some cool mysterious mails to your player's agents or if a character hacked into a company to investigate a clue or something.
-
-The `database.db` file (it's just a .txt json file), is where you will perform most editions at.
+The `database.json` file is where you will perform most editions at.
 The basic structure of the file (and the emails) is as follows:
 
 key -> id, password, user, mail.
 - id: is the username identificantion for login
 - password: is the password necessary to login
-- username: this is the name of the player character (if the terminal is where he check his emails) or the name of a npc (if he's hacking into someone else's terminal)
+- userName: this is the name of the player character (if the terminal is where he check his emails) or the name of a npc (if he's hacking into someone else's terminal)
 - mail: a array containing the following (key -> from, title, body)
 - - from: who send the message
 - - title: what you will see when listing the messages at terminal
@@ -84,7 +98,7 @@ You can register as many users and mail messages as you want, you just need to p
     "1": {
         "id": "8A73B5",
         "password": "trustno1",
-        "user": "Mulder, Fox",
+        "userName": "Mulder, Fox",
         "mail": {
             "1": {
                 "from": "Traveller",
@@ -105,6 +119,85 @@ You can register as many users and mail messages as you want, you just need to p
     }
 }
 ```
+
+### network.json
+
+This is where you can configure new servers to be accessed via telnet command.
+Each server will have a distinct user list, mail messages and server files. That is, you can't access data of a user configured on database.json while you're at another server.
+
+```json
+{
+    "freenode": {
+        "serverAddress": "111.222.3.4",
+        "serverName": "FreeNode",
+        "iconName": "world.svg",
+        "terminalID": "freenode",
+        "defaultUser": "",
+        "randomSeed": true,
+
+        "serverFiles": {
+            "1": ["f.txt", "foobar"]
+        },
+
+        "userList": {
+            "debug": {
+                "id": "x",
+                "password": "x",
+                "userName": "someoneElse1971",
+                "mail": {
+                    "1": {
+                        "from": "anon4562314",
+                        "title": "You're at FreeNode!",
+                        "body": "Freenode my boy....  Freenode."
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+### software.json
+
+This is where you can create your own software.
+At the moment you can just create simple software that will output some messages simulating an operation.
+After setting everything up you can just use it as name.filetype (i.e. cdata.exe).
+
+```json
+{
+    "cdata": {
+        "name": "cdata",
+        "filetype": "exe",
+        "delayed": true,
+        "message": [
+            "Corrupting data.",
+            "Corrupting data..",
+            "Corrupting data...",
+            "0% complete",
+            "11% complete",
+            "47% complete",
+            "98% complete",
+            "System successfully corrupted!"
+        ]
+    },
+
+    "analyze": {
+        "name": "analyze",
+        "filetype": "exe",
+        "delayed": false,
+        "message": "System successfull analyzed!"
+    }
+}
+```
+
+## Login, Mail & Read Functions
+
+The main functions are the `mail` and `read` terminal operations.
+
+Once you `login`, you can write down the `mail` function to list the user emails and you can `read` those mails you want by entering the index code (a number, a letter, or a string). 
+
+As a simple terminal emulation, you can't delete mails or mark as read. We maybe can work it out in the future, but those basic functions are enough to send some cool mysterious mails to your player's agents or if a character hacked into a company to investigate a clue or something.
+
 ---
 
 To login you need to enter user@password
@@ -123,7 +216,7 @@ How to list and read mails
 
 ### Other Functions
 
-You can try `help` to see a list of other functions disponible. The `clear` function may be a good one.
+You can try `help` to see a list of other functions disponible. The `clear` function may be a useful one.
 
 ## How to Install
 
@@ -175,5 +268,5 @@ If you want to, drop some ideas into my github repository or send me some messag
 - world.svg icon by: https://www.flaticon.com/authors/turkkub
 - fbi.png icon by: https://iconscout.com/contributors/icon-mafia
 
-### Icons Acknowledgemente (non-included)
+### Icons Acknowledgemente (not included)
 - (non-free) DNA icon by: https://www.iconfinder.com/icons/378473/dna_icon 
