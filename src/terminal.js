@@ -1,3 +1,8 @@
+// Global scope variables
+date = new Date()
+let logged = false
+
+
 /**
  * This is only used in the formatColums function, that have never been implemented.
  * 
@@ -7,23 +12,6 @@ var util = util || {};
 util.toArray = function(list) {
   return Array.prototype.slice.call(list || [], 0);
 };
-
-// function CommandNotFoundError(cmd) {
-//   return new Error (cmd + ': command not found');
-// }
-
-
-// Global scope variables
-date = new Date()
-var serverName;
-var database;
-var database_mail;
-var iconName;
-var terminalID;
-var prompt_text;
-var header;
-var prompt_text;
-let logged = false
 
 /**
  * Internal logic of terminal.
@@ -152,7 +140,6 @@ var Terminal = Terminal || function() {
         args = args.splice(1); // Remove cmd from arg list.
       }
 
-
       /**
        * The kernel function is at src/softwares.js
        * 
@@ -211,8 +198,7 @@ var Terminal = Terminal || function() {
    */
   return {
     init: function() {
-      output(header);
-      $('.prompt').html(prompt_text);
+      setHeader()
     },
     output: output
   }
@@ -223,26 +209,13 @@ var Terminal = Terminal || function() {
  */
 $(function() {
 
-  $.get("config/conf.json", function(configuration){
+  $.get("config/network/localhost/manifest.json", function(configuration){
 
     serverDatabase = configuration
-    userDatabase = configuration.defaultUser
+    userDatabase = serverDatabase.defaultUser
     
     date_final = date.getDay() + '/' + date.getMonth() + '/' + serverDatabase.year
   
-    // Setting correct header icon and terminal name
-    if (serverDatabase.randomSeed) {
-      prompt_text = '[' + userDatabase.userName + date.getTime() + '@' + serverDatabase.terminalID + '] # '
-    }
-    else {
-      prompt_text = '[' + userDatabase.userName  + '@' + serverDatabase.terminalID + '] # '
-    }
-    header = `
-    <img align="left" src="icon/` + serverDatabase.iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
-    <h2 style="letter-spacing: 4px">` + serverDatabase.serverName + `</h2>
-    <p>Logged in: ` + serverDatabase.serverAddress + ` ( ` + date_final + ` ) </p>
-    <p>Enter "help" for more information.</p>
-    `    
     // Initializing Terminal Object
     kernel.init('#input-line .cmdline', '#container output', date)
     .then(function(){
@@ -251,5 +224,3 @@ $(function() {
     })
   })
 });
-
-

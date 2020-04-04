@@ -1,9 +1,9 @@
 var cmdLine_;
 var output_;
 
-function testGet(file) {
-    $.get('config/' + file, function(result){
-        console.log(`WORKS?`)
+function testGet(arg) {
+    $.get('config/network/' + arg + '/userlist.json', function(result){
+        console.log(result)
     })
     .done(function(){
         console.log(`ONLINE IF OK`)
@@ -13,6 +13,23 @@ function testGet(file) {
     })
 }
 
+function setHeader(msg = '') {
+    // Setting correct header icon and terminal name
+    if (serverDatabase.randomSeed && !logged) 
+        prompt_text = '[' + userDatabase.userName + date.getTime() + '@' + serverDatabase.terminalID + '] # '
+    else 
+        prompt_text = '[' + userDatabase.userName  + '@' + serverDatabase.terminalID + '] # '
+    
+    header = `
+    <img align="left" src="config/network/`+ serverDatabase.serverAddress +`/` + serverDatabase.iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
+    <h2 style="letter-spacing: 4px">` + serverDatabase.serverName + `</h2>
+    <p>Logged in: ` + serverDatabase.serverAddress + ` ( ` + date_final + ` ) </p>
+    <p>Enter "help" for more information.</p>
+    `
+    system.clear()
+    output( [header, msg] )
+    $('.prompt').html(prompt_text);
+}
   /**
    * Cross-browser impl to get document's height.
    * 
@@ -106,7 +123,7 @@ kernel.init = function(cmdLineContainer, outputContainer, definedDate) {
           ];
     
         $.when(
-            $.get('config/database.json', function(list){
+            $.get('config/network/' + serverDatabase.serverAddress + '/userlist.json', function(list){
                 userList = list
             }),
             $.get('config/network.json', function(networkList){
@@ -125,6 +142,14 @@ var system = {
     foo: function(){
         return new Promise(function(resolve, reject) {
             resolve("bar")
+        })
+    },
+
+    whoami: function(){
+        return new Promise(function(resolve, reject) {
+            output(
+                serverDatabase.serverAddress + `/` + userDatabase.userId
+            )
         })
     },
 
@@ -248,27 +273,32 @@ var system = {
                 if (args[0] == value.userId && args[1] == value.password){
                     userFound = true
                     userDatabase = value;
-                    // logged = userDatabase.id;
                     logged = true
-                    output_.innerHTML = '';
-                    ans.push(header)
-                    ans.push('Login successful')
-                    prompt_text = '[' + userDatabase.userName + '@' + serverDatabase.terminalID + '] > '
-                    $('.prompt').html(prompt_text);
                 }
             })
             if(!userFound){
                 throw new UsernameIsEmptyError
             }
-            resolve(ans)
+            resolve(setHeader('Login successful'))
         })
         
+    },
+
+    logout: function() {
+        return new Promise(function(resolve, reject) {
+            if (!logged)
+                throw new LoginIsFalseError
+            
+            logged = false
+            userDatabase = serverDatabase.defaultUser
+            resolve(setHeader('Logout completed'))
+        })
     },
 
     mail: function(){
         return new Promise(function(resolve, reject) { 
             if (!logged){
-                resolve(`You need to login`)
+                throw new LoginIsFalseError
             }
     
             var ans = []
@@ -287,7 +317,7 @@ var system = {
     read: function(args){
         return new Promise(function(resolve, reject) {
             if (!logged){
-                resolve(`You need to login`)
+                throw new LoginIsFalseError
             }
             
             var ans = []
@@ -340,7 +370,6 @@ var system = {
                 throw new AddressIsEmptyError
             }
 
-            ans = []
             serverFound = false
             $.each(networkDatabase, function(index, value) {
                 if (value.serverAddress == args){
@@ -351,26 +380,7 @@ var system = {
                     userList = serverDatabase.userList
                     // serverFiles = value.serverFiles
 
-                    // Setting correct header icon and terminal name
-                    if (serverDatabase.randomSeed) {
-                        prompt_text = '[' + userDatabase.userName + date.getTime() + '@' + serverDatabase.terminalID + '] # '
-                    }
-                    else {
-                        prompt_text = '[' + userDatabase.userName  + '@' + serverDatabase.terminalID + '] # '
-                    }
-                    header = `
-                    <img align="left" src="icon/` + serverDatabase.iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
-                    <h2 style="letter-spacing: 4px">` + serverDatabase.serverName + `</h2>
-                    <p>Logged in: ` + serverDatabase.serverAddress + ` ( ` + date_final + ` ) </p>
-                    <p>Enter "help" for more information.</p>
-                    `
-                    ans.push(header)
-                    ans.push('Login successful')
-                    
-                    system.clear()
-                    $('.prompt').html(prompt_text);
-
-                    resolve(ans)
+                    resolve(setHeader('Connection successful'))
                 }
             })
 

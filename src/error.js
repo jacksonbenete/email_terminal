@@ -33,3 +33,10 @@ class MailServerIsEmptyError extends Error {
         this.message = (`There is no new mail registered.`)
     }
 }
+
+class LoginIsFalseError extends Error {
+    constructor(message) {
+        super(message)
+        this.message = (`You are not logged in.`)
+    }
+}
