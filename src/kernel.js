@@ -1,6 +1,18 @@
 var cmdLine_;
 var output_;
 
+function testGet(file) {
+    $.get('config/' + file, function(result){
+        console.log(`WORKS?`)
+    })
+    .done(function(){
+        console.log(`ONLINE IF OK`)
+    })
+    .fail(function(){
+        console.log('FAIL')
+    })
+}
+
   /**
    * Cross-browser impl to get document's height.
    * 
@@ -43,6 +55,12 @@ function output(data) {
     })
 }
 
+/**
+ * Isn't working as needed
+ * Needs to work with output() to output things one at time (delayed software message)
+ * 
+ * @param {Number} milliseconds 
+ */
 function sleep(milliseconds) {
     const date = Date.now();
     let currentDate = null;
@@ -105,7 +123,6 @@ kernel.init = function(cmdLineContainer, outputContainer, definedDate) {
 
 var system = {
     foo: function(){
-        // return "bar"
         return new Promise(function(resolve, reject) {
             resolve("bar")
         })
@@ -228,10 +245,11 @@ var system = {
             }
             args = args[0].split('@')
             $.each(userList, function(index, value){
-                if (args[0] == value.id && args[1] == value.password){
+                if (args[0] == value.userId && args[1] == value.password){
                     userFound = true
                     userDatabase = value;
-                    logged = userDatabase.id;
+                    // logged = userDatabase.id;
+                    logged = true
                     output_.innerHTML = '';
                     ans.push(header)
                     ans.push('Login successful')
@@ -280,7 +298,7 @@ var system = {
                     readOption = true
                     ans.push(`---------------------------------------------`)
                     ans.push(`From: ` + mail.from)
-                    ans.push(`To: ` + userDatabase.id + `@` + serverDatabase.terminalID)
+                    ans.push(`To: ` + userDatabase.userId + `@` + serverDatabase.terminalID)
                     ans.push(`---------------------------------------------`)
                     
                     $.each(mail.body.split("  "), function(i, b){
@@ -329,15 +347,16 @@ var system = {
                     serverFound = true
                     logged = false  // Lost email access if previous login
                     serverDatabase = value
+                    userDatabase = serverDatabase.defaultUser
                     userList = serverDatabase.userList
                     // serverFiles = value.serverFiles
 
                     // Setting correct header icon and terminal name
                     if (serverDatabase.randomSeed) {
-                        prompt_text = '[' + serverDatabase.defaultUser + date.getTime() + '@' + serverDatabase.terminalID + '] # '
+                        prompt_text = '[' + userDatabase.userName + date.getTime() + '@' + serverDatabase.terminalID + '] # '
                     }
                     else {
-                        prompt_text = '[' + serverDatabase.defaultUser  + '@' + serverDatabase.terminalID + '] # '
+                        prompt_text = '[' + userDatabase.userName  + '@' + serverDatabase.terminalID + '] # '
                     }
                     header = `
                     <img align="left" src="icon/` + serverDatabase.iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
@@ -363,28 +382,24 @@ var system = {
 
 var software =  function(app, args){
     return new Promise(function(resolve, reject) {
-        message = false
-        try {
-            args = app.split('.')
-            $.each(softwareDatabase, function(index, value){
-                if (args[0] == value.name && args[1] == value.filetype){
-                    program = value.name
-                    filetype = value.filetype
-                    delayed = value.delayed
-                    message = value.message
-                }
-            })
-            if (!message)
+
+        appName = app.split('.')[0]
+        appFiletype = app.split('.')[1]
+        
+        $.get('config/software/' + appName + '.json', function(softwareInfo) {
+            console.log(softwareInfo)
+            if  (
+                appFiletype == softwareInfo[appName].filetype &&
+                softwareInfo[appName].location.includes(serverDatabase.serverAddress) &&
+                softwareInfo[appName].protection.includes(userDatabase.userId)
+                )
+                resolve(softwareInfo[appName].message)
+            else
                 reject(new CommandNotFoundError(app))
-        }
-        finally{
-            if (message && delayed) {
-                // resolve({"delayed": true, "message": message})
-                resolve(message)
-            }
-            else {
-                resolve(message)
-            }
-        }
+        })
+        .fail(function(){
+            reject(new CommandNotFoundError(app))
+        })
+
     })
 }

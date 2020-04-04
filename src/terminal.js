@@ -226,15 +226,16 @@ $(function() {
   $.get("config/conf.json", function(configuration){
 
     serverDatabase = configuration
+    userDatabase = configuration.defaultUser
     
     date_final = date.getDay() + '/' + date.getMonth() + '/' + serverDatabase.year
   
     // Setting correct header icon and terminal name
     if (serverDatabase.randomSeed) {
-      prompt_text = '[' + serverDatabase.defaultUser + date.getTime() + '@' + serverDatabase.terminalID + '] # '
+      prompt_text = '[' + userDatabase.userName + date.getTime() + '@' + serverDatabase.terminalID + '] # '
     }
     else {
-      prompt_text = '[' + serverDatabase.defaultUser  + '@' + serverDatabase.terminalID + '] # '
+      prompt_text = '[' + userDatabase.userName  + '@' + serverDatabase.terminalID + '] # '
     }
     header = `
     <img align="left" src="icon/` + serverDatabase.iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
