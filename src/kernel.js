@@ -13,6 +13,13 @@ function testGet(arg) {
 		})
 }
 
+function debugObject(obj) {
+	for (var property in obj){
+		console.log(property + ": " + obj[property]);
+		output(property + ": " + obj[property])
+   }
+}
+
 function setHeader(msg = '') {
 	// Setting correct header icon and terminal name
 	if (serverDatabase.randomSeed && !logged)
@@ -113,33 +120,57 @@ var kernel = function(app, args) {
 
 }
 
-kernel.init = function(cmdLineContainer, outputContainer, definedDate) {
+kernel.init = function(cmdLineContainer, outputContainer) {
 	return new Promise(function(resolve, reject) {
 		cmdLine_ = document.querySelector(cmdLineContainer)
 		output_ = document.querySelector(outputContainer)
-		date = date
+		date = new Date()
 
 		CMDS_ = [
 			'clear', 'date', 'echo', 'help', 'login', 'mail', 'read', 'ping', 'telnet'
 		]
 
-		$.get('config/network/' + serverDatabase.serverAddress + '/userlist.json', function(list) {
-			userList = list
-			resolve(true)
+		$.get("config/network/localhost/manifest.json", function(configuration) {
+
+			serverDatabase = configuration
+			userDatabase = serverDatabase.defaultUser
+	
+			date_final = date.getDay() + '/' + date.getMonth() + '/' + serverDatabase.year
 		})
+		.done(function(){
+			$.when(
+				$.get('config/network/' + serverDatabase.serverAddress + '/userlist.json', function(list) {
+					userList = list
+				}),
+				$.get('config/network/' + serverDatabase.serverAddress + '/mailserver.json', function(list) {
+					mailList = list
+				})
+			).then(function() {
+ 				resolve(true)
+			})
+		})
+
 	})
 }
 
 var system = {
 	foo: function() {
 		return new Promise(function(resolve, reject) {
-			resolve("bar")
+			// resolve("bar")
+			output(`:: serverDatabase - connected server information`)
+			debugObject(serverDatabase)
+			output(`----------`)
+			output(`:: userDatabase - connected user information`)
+			debugObject(userDatabase)
+			output(`----------`)
+			output(`:: userList - list of users registered in the connected server`)
+			debugObject(userList)
 		})
 	},
 
 	whoami: function() {
 		return new Promise(function(resolve, reject) {
-			output(
+			resolve(
 				serverDatabase.serverAddress + `/` + userDatabase.userId
 			)
 		})
@@ -290,16 +321,16 @@ var system = {
 			if (!logged)
 				throw new LoginIsFalseError
 
-			var ans = []
+			var messageList = []
 
 			$.each(userDatabase.mail, function(index, mail) {
-				ans.push(`[` + index + `] ` + mail.title)
+				messageList.push(`[` + index + `] ` + mail.title)
 			})
 
-			if (ans == "")
+			if (messageList == "")
 				throw new MailServerIsEmptyError
 
-			resolve(ans)
+			resolve(messageList)
 		})
 	},
 

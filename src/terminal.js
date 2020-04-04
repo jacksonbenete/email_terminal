@@ -207,19 +207,10 @@ var Terminal = Terminal || function() {
  * The `Document.ready` function to initialize everything.
  */
 $(function() {
-
-	$.get("config/network/localhost/manifest.json", function(configuration) {
-
-		serverDatabase = configuration
-		userDatabase = serverDatabase.defaultUser
-
-		date_final = date.getDay() + '/' + date.getMonth() + '/' + serverDatabase.year
-
-		// Initializing Terminal Object
-		kernel.init('#input-line .cmdline', '#container output', date)
-			.then(function() {
-				var term = new Terminal()
-				term.init()
-			})
-	})
+	// Initializing Terminal Object
+	kernel.init('#input-line .cmdline', '#container output')
+		.then(function() {
+			var term = new Terminal()
+			term.init()
+		})
 })
