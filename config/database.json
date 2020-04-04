@@ -22,6 +22,29 @@
         }
     },
 
+    "2": {
+        "id": "a",
+        "password": "a",
+        "userName": "Mulder, Fox",
+        "mail": {
+            "1": {
+                "from": "Traveller",
+                "title": "Do not Open",
+                "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+            },
+            "2": {
+                "from": "Software",
+                "title": "undefined",
+                "body": "001100101 011000101 0110 10 01001 01 01110 1001010101"
+            },
+            "a": {
+                "from": "Josephus A. Miller",
+                "title": "Contrato n22",
+                "body": "Sector: X11.  Objective: Investigate the sewers and report only to me.  Reward: 22 MCr."
+            }
+        }
+    },
+
     "debug": {
         "id": "admin",
         "password": "admin",
