@@ -20,8 +20,9 @@ class AddressIsEmptyError extends Error {
     }
 }
 
-// module.exports = {
-//     CommandNotFoundError,
-//     AddressNotFoundError,
-//     AddressIsEmptyError
-// }
+class UsernameIsEmptyError extends Error {
+    constructor(message) {
+        super(message)
+        this.message = ([`This isn't a valid ID.`,`Try: login id@pass`])
+    }
+}
