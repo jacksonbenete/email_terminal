@@ -169,16 +169,17 @@ var Terminal = Terminal || function() {
               this.value = ''; // Clear/setup line for next input.
             })
             .catch(function(e) {
-              // throw new CommandNotFoundError(e, metadata)
-              output(e + ': command not found')
+              console.log(e)
+              if (e instanceof AddressIsEmptyError)
+                output(e.message)
+              if (e instanceof CommandNotFoundError)
+                output(e.message)
+              if (e instanceof AddressNotFoundError)
+                output(e.message)
             })
         }
   
       } catch (error) {
-        // if (error instanceof CommandNotFoundError) {
-        //   output(error.message);
-        //   console.log(error.metadata)
-        // }
         if (error instanceof TypeError) {
           output(cmd + ': command not found');
         }
@@ -269,18 +270,18 @@ $(function() {
     success:function(data)
     {
       // Data recovery
-      conf = JSON.parse(data)
-      newYear = conf.year
-      terminalID = conf.terminalID
-      iconName = conf.iconName
-      serverName = conf.serverName
-      defaultUser = conf.defaultUser
+      server = JSON.parse(data)
+      newYear = server.year
+      terminalID = server.terminalID
+      iconName = server.iconName
+      serverName = server.serverName
+      defaultUser = server.defaultUser
       
       date_final = date.getDay() + '/' + date.getMonth() + '/' + newYear
       var prompt_text;
 
       // Setting correct header icon and terminal name
-      if (conf.randomSeed) {
+      if (server.randomSeed) {
         prompt_text = '[' + defaultUser + date.getTime() + '@' + terminalID + '] # '
       }
       else {

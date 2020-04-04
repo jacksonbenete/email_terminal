@@ -166,8 +166,14 @@ If you want to, drop some ideas into my github repository or send me some messag
 
 ## Acknowledgement
 - Base code inspired by @AndrewBarfield, https://codepen.io/AndrewBarfield HTML5 Web Terminal.
-- Moon icon by: http://www.iconarchive.com/show/christmas-shadow-2-icons-by-pelfusion/Moon-icon.html and www.pelfusion.com
-- Tech icon by: https://favpng.com/png_user/GreatCthulhu
-- CMD icon by: https://www.flaticon.com/br/packs/seo-and-web-5
-- Vision icon by: https://www.flaticon.com/free-icon/company-vision_1465429
+
+### Icons Acknowledgement
+- Moon-icon.png by: http://www.iconarchive.com/show/christmas-shadow-2-icons-by-pelfusion/Moon-icon.html and www.pelfusion.com
+- tech.jpg icon by: https://favpng.com/png_user/GreatCthulhu
+- cmd.png icon by: https://www.flaticon.com/br/packs/seo-and-web-5
+- vision.svg icon by: https://www.flaticon.com/free-icon/company-vision_1465429
+- world.svg icon by: https://www.flaticon.com/authors/turkkub
+- fbi.png icon by: https://iconscout.com/contributors/icon-mafia
+
+### Icons Acknowledgemente (non-included)
 - (non-free) DNA icon by: https://www.iconfinder.com/icons/378473/dna_icon 

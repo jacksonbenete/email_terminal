@@ -1,3 +1,8 @@
+// import { CommandNotFoundError } from './error.js'
+// import { AddressNotFoundError } from './error.js'
+// import { AddressIsEmptyError } from './error.js'
+// import * as Error from 'error.js'
+
 var cmdLine_;
 var output_;
 /**
@@ -24,6 +29,8 @@ function sleep(milliseconds) {
 var CMDS_;
 var date;
 
+var connectionsDatabase;
+
 
 var kernel = function(app, args){
 
@@ -46,6 +53,15 @@ kernel.init = function(cmdLineContainer, outputContainer, definedDate) {
     CMDS_ = [
         'clear', 'date', 'echo', 'help', 'mail', 'read'
       ];
+
+    $.ajax({
+        url:"config/connections.json",
+        dataType:"text",
+        success:function(data)
+        {
+            connectionsDatabase = JSON.parse(data)
+        }
+    })
 }
 
 var system = {
@@ -97,8 +113,8 @@ var system = {
                         $.each(database, function(index, value){
                             if (args[0] == value.id && args[1] == value.password){
                                 logged = value.id;
-                                database = value;
-                                database_mail = value.mail;
+                                userDatabase = value;
+                                // userMailDatabase = value.mail;
                                 output_.innerHTML = '';
                                 ans.push(header)
                                 ans.push('Login successful')
@@ -127,9 +143,13 @@ var system = {
                 resolve(`You need to login`)
             }
     
-            $.each(database_mail, function(index, mail){
-                resolve(`[` + index + `] ` + mail.title)
+            var ans = []
+
+            $.each(userDatabase.mail, function(index, mail){
+                ans.push(`[` + index + `] ` + mail.title)
             })
+
+            resolve(ans)
         })
     },
 
@@ -142,7 +162,7 @@ var system = {
             var ans = []
 
             readOption = false
-            $.each(database_mail, function(index, mail){
+            $.each(userDatabase.mail, function(index, mail){
                 if (args[0] == index) {
                     readOption = true
                     ans.push(`---------------------------------------------`)
@@ -163,8 +183,74 @@ var system = {
 
             resolve(ans)
         })
-    }
+    },
 
+    ping: function(args){
+        return new Promise(function(resolve, reject) {
+            if (args == "") {
+                throw new AddressIsEmptyError
+            }
+
+            serverFound = false
+            $.each(connectionsDatabase, function(index, value) {
+                if (value.serverAddress == args){
+                    serverFound = true
+                    resolve(`Server ` + value.serverAddress + ` (` + value.serverName + `) can be reached`)
+                }
+            })
+
+            if (!serverFound)
+                throw new AddressNotFoundError(args)
+        })
+    },
+
+    telnet: function(args){
+        return new Promise(function(resolve, reject) {
+            if (args == "") {
+                throw new AddressIsEmptyError
+            }
+
+            ans = []
+            serverFound = false
+            $.each(connectionsDatabase, function(index, value) {
+                if (value.serverAddress == args){
+                    serverFound = true
+
+                    serverAddress = value.serverAddress
+                    serverName = value.serverName
+                    iconName = value.iconName
+                    terminalID = value.terminalID
+                    defaultUser = value.defaultUser
+                    randomSeed = value.randomSeed
+                    // serverFiles = value.serverFiles
+
+                    // Setting correct header icon and terminal name
+                    if (conf.randomSeed) {
+                        prompt_text = '[' + defaultUser + date.getTime() + '@' + terminalID + '] # '
+                    }
+                    else {
+                        prompt_text = '[' + defaultUser  + '@' + terminalID + '] # '
+                    }
+                    header = `
+                    <img align="left" src="icon/` + iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
+                    <h2 style="letter-spacing: 4px">` + serverName + `</h2>
+                    <p>Logged in: ` + serverAddress + ` ( ` + date.getUTCFullYear() + ` ) </p>
+                    <p>Enter "help" for more information.</p>
+                    `
+                    ans.push(header)
+                    ans.push('Login successful')
+                    
+                    system.clear()
+                    $('.prompt').html(prompt_text);
+
+                    resolve(ans)
+                }
+            })
+
+            if (!serverFound)
+                throw new AddressNotFoundError(args)
+        })
+    }
 }
 
 var software =  function(app, args){
@@ -186,23 +272,16 @@ var software =  function(app, args){
                             message = value.message
                         }
                     })
-                } catch (error) {
-                    console.log(message)
-                    return(false)
+                    if (!message)
+                        reject(new CommandNotFoundError(app))
                 }
                 finally{
-                    if(!message){
-                        reject(app)
-                    } else{
-                        
-                        if (delayed) {
-                            // resolve({"delayed": true, "message": message})
-                            resolve(message)
-                        }
-                        else {
-                            resolve(message)
-                        }
-                    
+                    if (message && delayed) {
+                        // resolve({"delayed": true, "message": message})
+                        resolve(message)
+                    }
+                    else {
+                        resolve(message)
                     }
                 }
             }
