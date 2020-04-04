@@ -1,0 +1,11 @@
+{
+    "analyze": {
+        "filename": "analyze",
+        "filetype": "exe",
+        "location": ["127.0.0.1", "localhost"],
+        "protection": ["admin"],
+        
+        "delayed": false,
+        "message": "System successfull analyzed!"
+    }
+}

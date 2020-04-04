@@ -1,0 +1,26 @@
+[
+    {
+        "from": "Traveller",
+        "to": ["8A73B5", "a"],
+        "title": "Do not Open",
+        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+    },
+    {
+        "from": "Software",
+        "to": ["8A73B5", "a"],
+        "title": "undefined",
+        "body": "001100101 011000101 0110 10 01001 01 01110 1001010101"
+    },
+    {
+        "from": "Josephus A. Miller",
+        "to": ["8A73B5", "a"],
+        "title": "Contrato n22",
+        "body": "Sector: X11.  Objective: Investigate the sewers and report only to me.  Reward: 22 MCr."
+    },
+    {
+        "from": "Mike",
+        "to": ["admin"],
+        "title": "wtf are you kidding me?",
+        "body": "Are you kidding me? Why don't you change your password?  The system is entirely compromised until you correct it.  You're the sysadmin, if you're this dumb the corporation is at risk."
+    }
+]
