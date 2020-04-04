@@ -205,6 +205,7 @@ var system = {
     
     login: function(args){
         var ans = []
+        var userFound = false
 
         return new Promise(function(resolve, reject) {
             if ( args == "" ){
@@ -213,6 +214,7 @@ var system = {
             args = args[0].split('@')
             $.each(userList, function(index, value){
                 if (args[0] == value.id && args[1] == value.password){
+                    userFound = true
                     userDatabase = value;
                     logged = userDatabase.id;
                     output_.innerHTML = '';
@@ -222,7 +224,7 @@ var system = {
                     $('.prompt').html(prompt_text);
                 }
             })
-            if(!logged){
+            if(!userFound){
                 throw new UsernameIsEmptyError
             }
             resolve(ans)
@@ -242,6 +244,9 @@ var system = {
                 ans.push(`[` + index + `] ` + mail.title)
             })
 
+            if (ans == ""){
+                throw new MailServerIsEmptyError
+            }
             resolve(ans)
         })
     },

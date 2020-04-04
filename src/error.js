@@ -26,3 +26,10 @@ class UsernameIsEmptyError extends Error {
         this.message = ([`This isn't a valid ID.`,`Try: login id@pass`])
     }
 }
+
+class MailServerIsEmptyError extends Error {
+    constructor(message) {
+        super(message)
+        this.message = (`There is no new mail registered.`)
+    }
+}
