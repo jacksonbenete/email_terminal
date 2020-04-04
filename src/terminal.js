@@ -50,6 +50,7 @@ var Terminal = Terminal || function() {
 
   cmdLine_.addEventListener('keydown', historyHandler_, false);
   cmdLine_.addEventListener('keydown', processNewCommand_, false);
+  cmdLine_.addEventListener('keydown', tabSuggestionHandler_, false);
   
   /**
    * @todo I don't think this is necessary, marked to be removed
@@ -104,18 +105,28 @@ var Terminal = Terminal || function() {
   }
 
   /**
+   * Prevents the `tab` key to lose/change focus.
+   * 
+   * @todo Implement tab suggestion
+   * 
+   * @param {Event} e keyCode 9 == Tab
+   */
+  function tabSuggestionHandler_(e) {
+    if (e.keyCode == 9) {
+      e.preventDefault();
+    }
+  }
+
+  /**
    * The main function to process commands.
    * 
    * This is a switch-case to deal with the internal logic.
    * 
-   * @param {Event} e 
+   * @param {Event} e keyCode 13 == Enter
    */
   function processNewCommand_(e) {
 
-    if (e.keyCode == 9) { // tab
-      e.preventDefault();
-      // Implement tab suggest.
-    } else if (e.keyCode == 13) { // enter
+    if (e.keyCode == 13) {
       // Save shell history.
       if (this.value) {
         history_[history_.length] = this.value;
@@ -148,52 +159,28 @@ var Terminal = Terminal || function() {
        * https://stackoverflow.com/questions/14220321/how-do-i-return-the-response-from-an-asynchronous-call
        */
       try {
-        // If the user enter a empty line, it will just ignore and output a new line in finally
-        if (cmd != undefined) {
-
           kernel(cmd, args)
-            .then(function(res){
-              if (typeof(res) == 'object'){
+            .then(function(result){
 
-                $.each(res, function(index, value) {
-                  output(value)
-                })
+              output(result)
 
-              }
-  
-              if (typeof(res) == 'string'){
-                output(res)
-              }
-  
-              window.scrollTo(0, getDocHeight_());
-              this.value = ''; // Clear/setup line for next input.
             })
             .catch(function(e) {
-              console.log(e)
               if (e instanceof AddressIsEmptyError)
                 output(e.message)
               if (e instanceof CommandNotFoundError)
                 output(e.message)
               if (e instanceof AddressNotFoundError)
                 output(e.message)
+              if (e instanceof UsernameIsEmptyError)
+                output(e.message)
             })
-        }
-  
-      } catch (error) {
-        if (error instanceof TypeError) {
-          output(cmd + ': command not found');
-        }
-        else {
-          output(error)
-          console.log(error)
-          console.log(error.metadata)
-        }
-  
-      } finally {
-  
-        window.scrollTo(0, getDocHeight_());
-        this.value = ''; // Clear/setup line for next input.
-  
+      }
+      catch (error) {
+        // If the user enter a empty line, it will just ignore and output a new line
+        if (cmd == undefined)
+          return output()
+        output(cmd + ': command not found');
       }
       
     }
@@ -225,29 +212,6 @@ var Terminal = Terminal || function() {
             colWidth, 'px;', height, '">'];
   }
 
-  // /**
-  //  * A function to padronize every output/return as a terminal print/echo function
-  //  * 
-  //  * @param {String} html The string to be returned as a print in terminal
-  //  */
-  // function output(html) {
-  //   output_.insertAdjacentHTML('beforeEnd', '<p>' + html + '</p>');
-  // }
-
-  /**
-   * Cross-browser impl to get document's height.
-   * 
-   * This function is necessary to auto-scroll to the end of page after each terminal command.
-   */
-  function getDocHeight_() {
-    var d = document;
-    return Math.max(
-        Math.max(d.body.scrollHeight, d.documentElement.scrollHeight),
-        Math.max(d.body.offsetHeight, d.documentElement.offsetHeight),
-        Math.max(d.body.clientHeight, d.documentElement.clientHeight)
-    );
-  }
-
   /**
    * This will automatically output the hearder when the object initialize (constructor?).
    */
@@ -264,44 +228,35 @@ var Terminal = Terminal || function() {
  */
 $(function() {
 
-  $.ajax({
-    url:"config/conf.json",
-    dataType:"text",
-    success:function(data)
-    {
-      // Data recovery
-      server = JSON.parse(data)
-      newYear = server.year
-      terminalID = server.terminalID
-      iconName = server.iconName
-      serverName = server.serverName
-      defaultUser = server.defaultUser
-      
-      date_final = date.getDay() + '/' + date.getMonth() + '/' + newYear
-      var prompt_text;
+  $.get("config/conf.json", function(configuration){
 
-      // Setting correct header icon and terminal name
-      if (server.randomSeed) {
-        prompt_text = '[' + defaultUser + date.getTime() + '@' + terminalID + '] # '
-      }
-      else {
-        prompt_text = '[' + defaultUser  + '@' + terminalID + '] # '
-      }
-      header = `
-      <img align="left" src="icon/` + iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
-      <h2 style="letter-spacing: 4px">` + serverName + `</h2>
-      <p>Logged in: ` + date.setFullYear(newYear) + ` ( ` + date_final + ` ) </p>
-      <p>Enter "help" for more information.</p>
-      `
-      $('.prompt').html(prompt_text);
-      
-      // Initializing Terminal Object
-      kernel.init('#input-line .cmdline', '#container output', date);
+    serverDatabase = configuration
+    
+    date_final = date.getDay() + '/' + date.getMonth() + '/' + serverDatabase.year
+    var prompt_text;
+  
+    // Setting correct header icon and terminal name
+    if (serverDatabase.randomSeed) {
+      prompt_text = '[' + serverDatabase.defaultUser + date.getTime() + '@' + serverDatabase.terminalID + '] # '
+    }
+    else {
+      prompt_text = '[' + serverDatabase.defaultUser  + '@' + serverDatabase.terminalID + '] # '
+    }
+    header = `
+    <img align="left" src="icon/` + serverDatabase.iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
+    <h2 style="letter-spacing: 4px">` + serverDatabase.serverName + `</h2>
+    <p>Logged in: ` + serverDatabase.serverAddress + ` ( ` + date_final + ` ) </p>
+    <p>Enter "help" for more information.</p>
+    `
+    $('.prompt').html(prompt_text);
+    
+    // Initializing Terminal Object
+    kernel.init('#input-line .cmdline', '#container output', date)
+    .then(function(){
       var term = new Terminal();
       term.init();
-
-    }
-  });
+    })
+  })
 });
 
 
