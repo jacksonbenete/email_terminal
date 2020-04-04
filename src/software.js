@@ -55,17 +55,26 @@ function sleep(milliseconds) {
 var CMDS_;
 var date;
 
+/**
+ * The Kernel will handle all software (system calls).
+ * 
+ * The app name will be checked first if it exists as a system 'native' command.
+ * If it doesn't, it will look for a custom software defined at software.json.
+ * 
+ * @param {String} app The app name
+ * @param {Array} args A list of Strings as args
+ */
 var kernel = function(app, args){
 
-    // if (app.substr(-4) == ".exe") {
-    //     return(software[app.split('.')[0]](args))
-    // }
-    if (app.indexOf('.') != -1) {
-        return(software(app, args))
-    }
-    else {
+    if (system[app])
         return(system[app](args))
-    }
+    
+    else if (system[app.replace('.', '_')])
+        return(system[app.replace('.', '_')](args))
+    
+    else
+        return(software(app, args))
+
 }
 
 kernel.init = function(cmdLineContainer, outputContainer, definedDate) {
@@ -119,6 +128,12 @@ var system = {
     echo: function(args){
         return new Promise(function(resolve, reject) {
             resolve(args.join(' '))
+        })
+    },
+
+    bar_exe: function(){
+        return new Promise(function(resolve, reject) {
+            resolve(`foobar.exe`)
         })
     },
 
