@@ -289,7 +289,7 @@ var system = {
 
 		return new Promise(function(resolve, reject) {
 			if (args == "")
-				throw new UsernameIsEmptyError
+				reject(new UsernameIsEmptyError)
 			args = args[0].split('@')
 			$.each(userList, function(index, value) {
 				if (args[0] == value.userId && args[1] == value.password) {
@@ -299,7 +299,8 @@ var system = {
 				}
 			})
 			if (!userFound)
-				throw new UsernameIsEmptyError
+				reject(new UsernameIsEmptyError)
+			
 			resolve(setHeader('Login successful'))
 		})
 
@@ -308,7 +309,7 @@ var system = {
 	logout: function() {
 		return new Promise(function(resolve, reject) {
 			if (!logged)
-				throw new LoginIsFalseError
+				reject(new LoginIsFalseError)
 
 			logged = false
 			userDatabase = serverDatabase.defaultUser
@@ -319,7 +320,7 @@ var system = {
 	mail: function() {
 		return new Promise(function(resolve, reject) {
 			if (!logged)
-				throw new LoginIsFalseError
+				reject(new LoginIsFalseError)
 
 			var messageList = []
 
@@ -329,7 +330,7 @@ var system = {
 			})
 
 			if (messageList == "")
-				throw new MailServerIsEmptyError
+				reject(new MailServerIsEmptyError)
 
 			resolve(messageList)
 		})
@@ -338,7 +339,7 @@ var system = {
 	read: function(args) {
 		return new Promise(function(resolve, reject) {
 			if (!logged)
-				throw new LoginIsFalseError
+				reject(new LoginIsFalseError)
 
 			var message = []
 
@@ -367,7 +368,7 @@ var system = {
 	ping: function(args) {
 		return new Promise(function(resolve, reject) {
 			if (args == "")
-				throw new AddressIsEmptyError
+				reject(new AddressIsEmptyError)
 
 			$.get('config/network/' + args + '/manifest.json', function(serverInfo) {
 				resolve(`Server ` + serverInfo.serverAddress + ` (` + serverInfo.serverName + `) can be reached`)
@@ -381,10 +382,10 @@ var system = {
 	telnet: function(args) {
 		return new Promise(function(resolve, reject) {
 			if (args == "")
-				throw new AddressIsEmptyError
+				reject(new AddressIsEmptyError)
 
 			if (args == serverDatabase.serverAddress)
-				throw new AddressDuplicatedError(args)
+				reject(new AddressDuplicatedError(args))
 			
 			$.get('config/network/' + args + '/manifest.json', function(serverInfo) {
 				logged = true
