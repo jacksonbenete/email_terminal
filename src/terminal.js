@@ -22,6 +22,7 @@ var iconName;
 var terminalID;
 var prompt_text;
 var header;
+var prompt_text;
 let logged = false
 
 /**
@@ -211,6 +212,7 @@ var Terminal = Terminal || function() {
   return {
     init: function() {
       output(header);
+      $('.prompt').html(prompt_text);
     },
     output: output
   }
@@ -226,7 +228,6 @@ $(function() {
     serverDatabase = configuration
     
     date_final = date.getDay() + '/' + date.getMonth() + '/' + serverDatabase.year
-    var prompt_text;
   
     // Setting correct header icon and terminal name
     if (serverDatabase.randomSeed) {
@@ -240,9 +241,7 @@ $(function() {
     <h2 style="letter-spacing: 4px">` + serverDatabase.serverName + `</h2>
     <p>Logged in: ` + serverDatabase.serverAddress + ` ( ` + date_final + ` ) </p>
     <p>Enter "help" for more information.</p>
-    `
-    $('.prompt').html(prompt_text);
-    
+    `    
     // Initializing Terminal Object
     kernel.init('#input-line .cmdline', '#container output', date)
     .then(function(){
