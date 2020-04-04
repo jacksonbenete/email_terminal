@@ -166,14 +166,7 @@ var Terminal = Terminal || function() {
 
             })
             .catch(function(e) {
-              if (e instanceof AddressIsEmptyError)
-                output(e.message)
-              if (e instanceof CommandNotFoundError)
-                output(e.message)
-              if (e instanceof AddressNotFoundError)
-                output(e.message)
-              if (e instanceof UsernameIsEmptyError)
-                output(e.message)
+              output(e.message)
             })
       }
       catch (error) {
