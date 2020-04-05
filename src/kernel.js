@@ -120,6 +120,26 @@ var kernel = function(app, args) {
 
 }
 
+kernel.getDatabases = function() {
+	userDatabase = serverDatabase.defaultUser
+	$.when(
+		$.get('config/network/' + serverDatabase.serverAddress + '/userlist.json', function(list) {
+			userList = list
+		})
+		.fail(function() {
+			userList = []
+		}),
+		$.get('config/network/' + serverDatabase.serverAddress + '/mailserver.json', function(list) {
+			mailList = list
+		})
+		.fail(function(){
+			mailList = []
+		})
+	).then(function() {
+		return(true)
+	})
+}
+
 kernel.init = function(cmdLineContainer, outputContainer) {
 	return new Promise(function(resolve, reject) {
 		cmdLine_ = document.querySelector(cmdLineContainer)
@@ -131,23 +151,12 @@ kernel.init = function(cmdLineContainer, outputContainer) {
 		]
 
 		$.get("config/network/localhost/manifest.json", function(configuration) {
-
 			serverDatabase = configuration
-			userDatabase = serverDatabase.defaultUser
-	
 			date_final = date.getDay() + '/' + date.getMonth() + '/' + serverDatabase.year
+			kernel.getDatabases()
 		})
 		.done(function(){
-			$.when(
-				$.get('config/network/' + serverDatabase.serverAddress + '/userlist.json', function(list) {
-					userList = list
-				}),
-				$.get('config/network/' + serverDatabase.serverAddress + '/mailserver.json', function(list) {
-					mailList = list
-				})
-			).then(function() {
- 				resolve(true)
-			})
+			resolve(true)
 		})
 
 	})
@@ -284,12 +293,11 @@ var system = {
 	},
 
 	login: function(args) {
-		var ans = []
 		var userFound = false
 
 		return new Promise(function(resolve, reject) {
 			if (args == "")
-				reject(new UsernameIsEmptyError)
+				return reject(new UsernameIsEmptyError)
 			args = args[0].split('@')
 			$.each(userList, function(index, value) {
 				if (args[0] == value.userId && args[1] == value.password) {
@@ -299,7 +307,7 @@ var system = {
 				}
 			})
 			if (!userFound)
-				reject(new UsernameIsEmptyError)
+				return reject(new UsernameIsEmptyError)
 			
 			resolve(setHeader('Login successful'))
 		})
@@ -309,7 +317,7 @@ var system = {
 	logout: function() {
 		return new Promise(function(resolve, reject) {
 			if (!logged)
-				reject(new LoginIsFalseError)
+				return reject(new LoginIsFalseError)
 
 			logged = false
 			userDatabase = serverDatabase.defaultUser
@@ -319,8 +327,6 @@ var system = {
 
 	mail: function() {
 		return new Promise(function(resolve, reject) {
-			if (!logged)
-				reject(new LoginIsFalseError)
 
 			var messageList = []
 
@@ -330,7 +336,7 @@ var system = {
 			})
 
 			if (messageList == "")
-				reject(new MailServerIsEmptyError)
+				return reject(new MailServerIsEmptyError)
 
 			resolve(messageList)
 		})
@@ -338,8 +344,6 @@ var system = {
 
 	read: function(args) {
 		return new Promise(function(resolve, reject) {
-			if (!logged)
-				reject(new LoginIsFalseError)
 
 			var message = []
 
@@ -359,7 +363,7 @@ var system = {
 			})
 
 			if (!readOption)
-				reject(new InvalidMessageKeyError)
+				return reject(new InvalidMessageKeyError)
 
 			resolve(message)
 		})
@@ -368,13 +372,13 @@ var system = {
 	ping: function(args) {
 		return new Promise(function(resolve, reject) {
 			if (args == "")
-				reject(new AddressIsEmptyError)
+				return reject(new AddressIsEmptyError)
 
 			$.get('config/network/' + args + '/manifest.json', function(serverInfo) {
 				resolve(`Server ` + serverInfo.serverAddress + ` (` + serverInfo.serverName + `) can be reached`)
 			})
 			.fail(function(){
-				reject(new AddressNotFoundError(args))
+				return reject(new AddressNotFoundError(args))
 			})
 		})
 	},
@@ -382,20 +386,18 @@ var system = {
 	telnet: function(args) {
 		return new Promise(function(resolve, reject) {
 			if (args == "")
-				reject(new AddressIsEmptyError)
+				return reject(new AddressIsEmptyError)
 
 			if (args == serverDatabase.serverAddress)
-				reject(new AddressDuplicatedError(args))
+				return reject(new AddressDuplicatedError(args))
 			
 			$.get('config/network/' + args + '/manifest.json', function(serverInfo) {
-				logged = true
+				logged = false
 				serverDatabase = serverInfo
-				resolve(setHeader('Connection successful'))
+				kernel.getDatabases()
 			})
 			.done(function(){
-				$.get('config/network/' + serverDatabase.serverAddress + '/userlist.json', function(list) {
-					userList = list
-				})
+				resolve(setHeader('Connection successful'))
 			})
 			.fail(function(){
 				reject(new AddressNotFoundError(args))
