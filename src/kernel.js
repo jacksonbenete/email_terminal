@@ -415,11 +415,11 @@ var software = function(app, args) {
 		$.get('config/software/' + appName + '.json', function(softwareInfo) {
 
 				if (
-					appFiletype == softwareInfo[appName].filetype &&
-					softwareInfo[appName].location.includes(serverDatabase.serverAddress) &&
-					softwareInfo[appName].protection.includes(userDatabase.userId)
+					appFiletype == softwareInfo.filetype &&
+					(softwareInfo.location.includes(serverDatabase.serverAddress) || softwareInfo.location.includes("all")) &&
+					(!softwareInfo.protection || softwareInfo.protection.includes(userDatabase.userId))
 				)
-					resolve(softwareInfo[appName].message)
+					resolve(softwareInfo.message)
 				
 				else
 					reject(new CommandNotFoundError(app))

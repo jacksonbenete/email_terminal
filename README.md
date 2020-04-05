@@ -164,26 +164,26 @@ After setting everything up you can just use it as the defined name.filetype (i.
 -  delayed: this will create an effect to each message to be slowly printed at terminal, the number is in milliseconds
 - message: the actual message to be displayed as an emulation of the software running
 
+Note that you can set `protection` as `false` (boolean) if you want any user to access the software, and you can set `location` as `"all"` if you want every server to have access on it.
+
 ```json
 {
-    "cdata": {
-        "filename": "cdata",
-        "filetype": "exe",
-        "location": ["127.0.0.1", "localhost"],
-        "protection": ["admin"],
-                
-        "delayed": 2000,
-        "message": [
-            "Corrupting data.",
-            "Corrupting data..",
-            "Corrupting data...",
-            "0% complete",
-            "11% complete",
-            "47% complete",
-            "98% complete",
-            "System successfully corrupted!"
-        ]
-    }
+    "filename": "cdata",
+    "filetype": "exe",
+    "location": ["127.0.0.1", "localhost"],
+    "protection": ["admin"],
+            
+    "delayed": 2000,
+    "message": [
+        "Corrupting data.",
+        "Corrupting data..",
+        "Corrupting data...",
+        "0% complete",
+        "11% complete",
+        "47% complete",
+        "98% complete",
+        "System successfully corrupted!"
+    ]
 }
 ```
 
