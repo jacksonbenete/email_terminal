@@ -1,17 +1,7 @@
+var CMDS_
+var date
 var cmdLine_
 var output_
-
-function testGet(arg) {
-	$.get('config/network/' + arg + '/userlist.json', function(result) {
-			console.log(result)
-		})
-		.done(function() {
-			console.log(`ONLINE IF OK`)
-		})
-		.fail(function() {
-			console.log('FAIL')
-		})
-}
 
 function debugObject(obj) {
 	for (var property in obj){
@@ -20,6 +10,13 @@ function debugObject(obj) {
    }
 }
 
+/**
+ * Set Header and Prompt informations.
+ * 
+ * This function is useful to avoid code repetition.
+ * 
+ * @param {String} msg A message to be showed when done
+ */
 function setHeader(msg = '') {
 	// Setting correct header icon and terminal name
 	if (serverDatabase.randomSeed && !logged)
@@ -37,6 +34,7 @@ function setHeader(msg = '') {
 	output([header, msg])
 	$('.prompt').html(prompt_text)
 }
+
 /**
  * Cross-browser impl to get document's height.
  * 
@@ -51,6 +49,11 @@ function getDocHeight_() {
 	)
 }
 
+/**
+ * Scroll to bottom and clear the input value for a new line.
+ * 
+ * @param {Object} object The Input.cmdline right of the div.prompt
+ */
 function newLine(object = cmdLine_) {
 	window.scrollTo(0, getDocHeight_())
 	object.value = '' // Clear/setup line for next input.
@@ -94,15 +97,15 @@ function sleep(milliseconds) {
 	} while (currentDate - date < milliseconds)
 }
 
-// A list of terminal implemented functions (to show in help)
-var CMDS_
-var date
-
 /**
  * The Kernel will handle all software (system calls).
  * 
  * The app name will be checked first if it exists as a system 'native' command.
  * If it doesn't, it will look for a custom software defined at software.json.
+ * 
+ * You can define commands with filetypes by naming the function as command_type.
+ * The kernel will handle every `.` as a `_` when looking for the correct software.
+ * i.e. the `bar_exe` function needs to be called as the `bar.exe` command in the Terminal.
  * 
  * @param {String} app The app name
  * @param {Array} args A list of Strings as args
@@ -120,6 +123,11 @@ var kernel = function(app, args) {
 
 }
 
+/**
+ * Recover the correct databases for the current server.
+ * 
+ * Some functions like `system.telnet()` needs to rewrite the databases variables.
+ */
 kernel.getDatabases = function() {
 	userDatabase = serverDatabase.defaultUser
 	$.when(
@@ -140,6 +148,14 @@ kernel.getDatabases = function() {
 	})
 }
 
+/**
+ * This will initialize the kernel function.
+ * 
+ * It will define the help functions, set some important variables and connect the databases.
+ * 
+ * @param {Object} cmdLineContainer The Input.cmdline right of the div.prompt
+ * @param {Object} outputContainer The output element inside the div#container
+ */
 kernel.init = function(cmdLineContainer, outputContainer) {
 	return new Promise(function(resolve, reject) {
 		cmdLine_ = document.querySelector(cmdLineContainer)
@@ -162,6 +178,12 @@ kernel.init = function(cmdLineContainer, outputContainer) {
 	})
 }
 
+/**
+ * Internal command functions.
+ * 
+ * This is where the internal commands are located.
+ * This should have every non-custom software command functions.
+ */
 var system = {
 	foo: function() {
 		return new Promise(function(resolve, reject) {
@@ -406,6 +428,14 @@ var system = {
 	}
 }
 
+/**
+ * The custom software caller.
+ * 
+ * This will look for custom softwares installed at the `software` folder.
+ * 
+ * @param {String} app The software name
+ * @param {String} args Args to be handle if any
+ */
 var software = function(app, args) {
 	return new Promise(function(resolve, reject) {
 
