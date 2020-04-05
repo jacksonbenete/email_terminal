@@ -1,0 +1,14 @@
+{
+    "serverAddress": "11.152.9.6",
+    "serverName": "Data Finder S.A.",
+    "iconName": "tech.jpg",
+    "terminalID": "11.152.9.6",
+    "defaultUser": {
+        "userId": "user",
+        "password": "",
+        "userName": "privateConnection"
+    },
+    "randomSeed": false,
+    
+    "latestKernel": true
+}

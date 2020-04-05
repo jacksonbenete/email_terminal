@@ -1,0 +1,14 @@
+{
+    "serverAddress": "mono.city.ac.uk",
+    "serverName": "Monochrome BBS",
+    "iconName": "cmd.png",
+    "terminalID": "city",
+    "defaultUser": {
+        "userId": "user",
+        "password": "",
+        "userName": "anon"
+    },
+    "randomSeed": false,
+    
+    "latestKernel": true
+}

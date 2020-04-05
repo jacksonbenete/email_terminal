@@ -1,0 +1,14 @@
+{
+    "serverAddress": "fbi.gov",
+    "serverName": "Federal Bureau of Investigation",
+    "iconName": "fbi.png",
+    "terminalID": "fbi",
+    "defaultUser": {
+        "userId": "user",
+        "password": "",
+        "userName": "anonymous"
+    },
+    "randomSeed": true,
+    
+    "latestKernel": true
+}
