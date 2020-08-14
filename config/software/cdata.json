@@ -2,9 +2,9 @@
     "filename": "cdata",
     "filetype": "exe",
     "location": ["127.0.0.1", "localhost"],
-    "protection": ["admin"],
+    "protection": ["admin", "user"],
             
-    "delayed": 2000,
+    "delayed": 500,
     "message": [
         "Corrupting data.",
         "Corrupting data..",

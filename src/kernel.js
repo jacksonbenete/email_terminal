@@ -25,13 +25,17 @@ function setHeader(msg = '') {
 		prompt_text = '[' + userDatabase.userName + '@' + serverDatabase.terminalID + '] # '
 
 	header = `
-    <img align="left" src="config/network/` + serverDatabase.serverAddress + `/` + serverDatabase.iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
-    <h2 style="letter-spacing: 4px">` + serverDatabase.serverName + `</h2>
+	<div class="col-1 align-self-center" style="max-width: 100%"><img src="config/network/` + serverDatabase.serverAddress + `/` + serverDatabase.iconName + `" width="100" height="100"></div>
+	<div class="col">
+	<h2 style="letter-spacing: 4px">` + serverDatabase.serverName + `</h2>
     <p>Logged in: ` + serverDatabase.serverAddress + ` ( ` + date_final + ` ) </p>
     <p>Enter "help" for more information.</p>
-    `
+	</div>
+	`
+
 	system.clear()
-	output([header, msg])
+	$("#header").html(header)
+	output(msg)
 	$('.prompt').html(prompt_text)
 }
 
@@ -97,6 +101,63 @@ function sleep(milliseconds) {
 	} while (currentDate - date < milliseconds)
 }
 
+function testeDelay() {
+	// ['a', 'b', 'c', 'd', 'e', 'f'].forEach(function(elemento, indice){
+	// 	console.log(indice)
+	// 	setTimeout(function(){
+	// 	  $("#outer-container").html(elemento)
+	// 	}, 100 * indice)
+	//   })
+	// list = ['a', 'b', 'c', 'd', 'e', 'f']
+	// $.each(list, function(index, value) {
+	// 	setTimeout(function() {
+	// 		$("#outer-container").html(value)
+	// 	}, 200 * index)
+	// })
+	list = [0, 1, 2, 2, 2]
+	list = [0, 1, 2, 3, 3, 4, 2, 2, 3]
+	
+	$.each(list, function(index, value) {
+		setTimeout(function() {
+			console.log(value)
+			$("#outer-container").html(value)
+		}, 200 * index)
+	})
+
+
+	// for (var i = 1; 1 <= 100; i++) {
+	// 	setTimeout(function() {
+	// 		// $("#outer-container").html(value)
+	// 		console.log(`Status: ` + i + `%`)
+	// 	}, 2*i)
+	// }
+	// $.each(['a', 'b', 'c', 'd', 'e', 'f'], function(index, value) {
+	// 	setTimeout(function() {
+	// 		$("#outer-container").html(value)
+	// 	}, 2000)
+	// })
+}
+
+// function testeDelay() {
+// 	list = ['a', 'b', 'c', 'd', 'e', 'f']
+// 	// for (const cmd of list) {
+// 	// 	sleep(200)
+// 	// 	console.log(cmd)
+// 	// 	$("#outer-container").html(cmd);
+// 	// }
+
+// 	// var p = Promise.resolve(); // Q() in q
+
+// 	// list.forEach(cmd =>
+// 	// 	p = p.then(() => $("#outer-container").html(cmd), sleep(200))
+// 	// )
+// 	// return p
+
+// 	return list.reduce((p, cmd) => {
+// 		return p.then(() => $("#outer-container").html(cmd), sleep(200));
+// 	}, Promise.resolve()); // initial
+// }
+
 /**
  * The Kernel will handle all software (system calls).
  * 
@@ -122,6 +183,7 @@ var kernel = function(app, args) {
 		return (software(app, args))
 
 }
+
 
 /**
  * Recover the correct databases for the current server.
@@ -199,6 +261,20 @@ var system = {
 		})
 	},
 
+	row: function() {
+		return new Promise(function(resolve, reject) {
+			result = `
+			<div class="row">
+			<div class="col">a</div>
+			<div class="col">b</div>
+			</div>
+			`
+			// $("#outer-container").html(result)
+			doEach(CMDS_)
+			resolve(true)
+		})
+	},
+
 	whoami: function() {
 		return new Promise(function(resolve, reject) {
 			resolve(
@@ -236,11 +312,18 @@ var system = {
 	help: function(args) {
 		return new Promise(function(resolve, reject) {
 			if (args == '') {
-				resolve([
-					`You can read the help of a specific command by entering as follows: 'help commandName'`,
-					`List of useful commands:`,
-					'<div class="ls-files">' + CMDS_.join('<br>') + '</div>'
-				])
+				list = []
+				list.push(`<div class="row">`)
+				$.each(CMDS_, function(index, value) {
+					list.push(`<div class="col-3">` + value + `</div>`)
+				})
+				list.push(`</div>`)
+				resolve(list.join(''))
+				// resolve([
+				// 	`You can read the help of a specific command by entering as follows: 'help commandName'`,
+				// 	`List of useful commands:`,
+				// 	'<div class="ls-files">' + CMDS_.join('<br>') + '</div>'
+				// ])
 			}
 			if (args[0] == 'clear') {
 				resolve([
@@ -373,10 +456,10 @@ var system = {
 			$.each(mailList, function(index, mail) {
 				if (mail.to.includes(userDatabase.userId) && args[0] == index) {
 					readOption = true
-					message.push(`---------------------------------------------`)
+					message.push(`<hr>`)
 					message.push(`From: ` + mail.from)
 					message.push(`To: ` + userDatabase.userId + `@` + serverDatabase.terminalID)
-					message.push(`---------------------------------------------`)
+					message.push(`<hr>`)
 
 					$.each(mail.body.split("  "), function(i, b) {
 						message.push(b)
@@ -448,11 +531,22 @@ var software = function(app, args) {
 					appFiletype == softwareInfo.filetype &&
 					(softwareInfo.location.includes(serverDatabase.serverAddress) || softwareInfo.location.includes("all")) &&
 					(!softwareInfo.protection || softwareInfo.protection.includes(userDatabase.userId))
-				)
-					resolve(softwareInfo.message)
-				
-				else
+				) {
+					if (softwareInfo.delayed) {
+						$.each(softwareInfo.message, function(index, value) {
+							setTimeout(function() {
+								$("#outer-container").html(value)
+							}, softwareInfo.delayed * index)
+						})
+						resolve(true)
+					} 
+					else {
+						resolve(softwareInfo.message)
+					}
+				}
+				else {
 					reject(new CommandNotFoundError(app))
+				}
 				
 			})
 			.fail(function() {

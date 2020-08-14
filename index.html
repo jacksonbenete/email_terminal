@@ -3,14 +3,24 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
     <title>Terminal</title>
+    <link href="src/lib/bootstrap-grid.min.css" rel="stylesheet" type="text/css">
     <link href="src/terminal.css" rel="stylesheet" type="text/css">
     <link rel="shortcut icon" href="">
   </head>
-  <body>
-    <div id="container">
-      <output></output>
-      <div id="input-line" class="input-line">
-        <div class="prompt"></div><div><input class="cmdline" autofocus /></div>
+  <body class="container-fluid">
+    <div class="row row-cols-4" id="header"></div>
+
+    <div class="row">
+      <div class="col">
+        <div id="container">
+          <output class=""></output>
+          <div id="input-line" class="input-line">
+            <div class="prompt"></div><div><input class="cmdline" autofocus /></div>
+          </div>
+        </div>
+      </div>
+      <div class="col" id="outer-container">
+        atualize aqui
       </div>
     </div>
     
