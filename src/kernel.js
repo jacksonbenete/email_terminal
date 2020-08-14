@@ -29,10 +29,15 @@ function setHeader(msg = '') {
     <h2 style="letter-spacing: 4px">` + serverDatabase.serverName + `</h2>
     <p>Logged in: ` + serverDatabase.serverAddress + ` ( ` + date_final + ` ) </p>
     <p>Enter "help" for more information.</p>
-    `
-	system.clear()
-	output([header, msg])
-	$('.prompt').html(prompt_text)
+	`
+	
+	$.when( 
+		system.clear() 
+		)
+		.then(function() {
+			output([header, msg])
+			$('.prompt').html(prompt_text)
+		})
 }
 
 /**
@@ -211,7 +216,7 @@ var system = {
 		return new Promise(function(resolve, reject) {
 			output_.innerHTML = ''
 			cmdLine_.value = ''
-			resolve(false)
+			resolve(true)
 		})
 	},
 
