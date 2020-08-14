@@ -1,0 +1,8 @@
+{
+    "directories": ["documents", "downloads"],
+
+    "files": [
+        ["big_text", ".txt", "documents", ["admin"], "this is a text file"],
+        ["text2", ".txt", "downloads", ["admin"], "file is corrupted"]
+    ]
+}

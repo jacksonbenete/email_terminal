@@ -1,0 +1,20 @@
+[
+    {
+        "filename": "big.txt",
+        "date": "13/01/1972",
+        "location": [
+            ["user", "/"]
+        ],
+        "content": "This is a big text."
+    },
+
+    {
+        "filename": "code.o",
+        "date": "13/01/1972",
+        "location": [
+            ["admin", "documents"],
+            ["a", "downloads"]
+        ],
+        "content": "00111101001110 10110101 000101011011 01111111000101"
+    }
+]

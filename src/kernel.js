@@ -130,6 +130,7 @@ var kernel = function(app, args) {
  */
 kernel.getDatabases = function() {
 	userDatabase = serverDatabase.defaultUser
+	cwd = "/"
 	$.when(
 		$.get('config/network/' + serverDatabase.serverAddress + '/userlist.json', function(list) {
 			userList = list
@@ -196,6 +197,27 @@ var system = {
 			output(`----------`)
 			output(`:: userList - list of users registered in the connected server`)
 			debugObject(userList)
+		})
+	},
+
+	ls: function() {
+		return new Promise(function(resolve, reject) {
+			var fileList = []
+			$.get('config/network/' + serverDatabase.serverAddress + '/filesystem_global.json', function(list) {
+				$.each(list, function(index, file) {
+					// '<div class="ls-files">' + CMDS_.join('<br>') + '</div>'
+					$.each(file.location, function(i, option) {
+						if (option[0] == userDatabase.userId && option[1] == cwd) {
+							// fileList.push(
+							// 	'<div class="ls-files">' + file.date + '<br>' + file.filename + '<br>' + 'foo</div>'
+							// )
+							fileList.push(file.filename)
+							fileList.push(file.date)
+						}
+					})
+				})
+				resolve(fileList)
+			})
 		})
 	},
 
@@ -331,6 +353,7 @@ var system = {
 			if (!userFound)
 				return reject(new UsernameIsEmptyError)
 			
+			cwd = "/"
 			resolve(setHeader('Login successful'))
 		})
 

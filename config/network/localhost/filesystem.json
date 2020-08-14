@@ -1,0 +1,13 @@
+{
+    "directories": ["documents", "downloads"],
+    
+    "files": [
+        {
+            "filename": "big_text",
+            "filetype": ".txt",
+            "location": "documents",
+            "protection": ["admin"],
+            "content": "this is a text file"
+        }
+    ]
+}

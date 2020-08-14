@@ -1,0 +1,18 @@
+{
+    "directories": {
+        "documents": [
+            {
+                "filename": "big_text",
+                "filetype": ".txt",
+                "location": "documents",
+                "protection": ["admin"],
+                "content": "this is a text file"
+            }
+        ],
+
+        "downloads": [
+            ["big_text", ".txt", "documents", ["admin"], "this is a text file"],
+            ["text2", ".txt", "downloads", ["admin"], "file is corrupted"]
+        ]
+    }
+}
