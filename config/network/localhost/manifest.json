@@ -2,7 +2,7 @@
     "year": "1978",
     "serverAddress": "localhost",
     "serverName": "MCI-Mail",
-    "iconName": "Moon-icon.png",
+    "iconName": "MCI_logo_old.svg",
     "terminalID": "Y56",
     "defaultUser": {
         "userId": "user",
