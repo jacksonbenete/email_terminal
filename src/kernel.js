@@ -69,11 +69,21 @@ function newLine(object = cmdLine_) {
  */
 function output(data) {
 	return new Promise(function(resolve, reject) {
+		var delayed = 0;
+
+		if (typeof(data) == 'object' && data.text) {
+			delayed = data.delayed;
+			data = data.text;
+		}
 
 		if (typeof(data) == 'object') {
-			$.each(data, function(index, value) {
-				output_.insertAdjacentHTML('beforeEnd', '<p>' + value + '</p>')
-			})
+			if (delayed && data.length > 0) {
+				outputLinesWithDelay(data, delayed);
+			} else {
+				$.each(data, function(index, value) {
+					output_.insertAdjacentHTML('beforeEnd', '<p>' + value + '</p>')
+				})
+			}
 		}
 		if (typeof(data) == 'string') {
 			output_.insertAdjacentHTML('beforeEnd', '<p>' + data + '</p>')
@@ -84,17 +94,17 @@ function output(data) {
 }
 
 /**
- * Isn't working as needed
- * Needs to work with output() to output things one at time (delayed software message)
+ * Print lines of text with some delay between them.
  * 
- * @param {Number} milliseconds 
+ * @param {Array} lines list of strings to display
+ * @param {Number} delayed delay in milliseconds between which to display lines
  */
-function sleep(milliseconds) {
-	const date = Date.now()
-	let currentDate = null
-	do {
-		currentDate = Date.now()
-	} while (currentDate - date < milliseconds)
+function outputLinesWithDelay(lines, delayed) {
+	var line = lines.shift();
+	output_.insertAdjacentHTML('beforeEnd', '<p>' + line + '</p>');
+	if (lines.length > 0) {
+		setTimeout(outputLinesWithDelay, delayed, lines, delayed);
+	}
 }
 
 /**
@@ -449,7 +459,7 @@ var software = function(app, args) {
 					(softwareInfo.location.includes(serverDatabase.serverAddress) || softwareInfo.location.includes("all")) &&
 					(!softwareInfo.protection || softwareInfo.protection.includes(userDatabase.userId))
 				)
-					resolve(softwareInfo.message)
+					resolve({text: softwareInfo.message, delayed: softwareInfo.delayed})
 				
 				else
 					reject(new CommandNotFoundError(app))
