@@ -254,6 +254,19 @@ But, there are some things that could be also good to explore, like the creation
 
 If you want to, drop some ideas into my Github repository or send me some messages at Reddit (u/jacksonbenete) and we can work out something else.
 
+## Customization / what to do with this
+This section lists ideas to craft the perfect terminal for your game!
+
+* use cool servers icon like [@countersleuth](https://countersleuth.github.io/email_terminal/) or [@curiouswhorge](https://curiouswhorge.github.io/D540nm_comm-terminal/) did
+* hide information among several servers. 
+  Check out [@KrymsonWake](https://github.com/KrymsonWake/email_terminal/tree/master/config/network) 6 different servers
+  by connecting to them with `telnet SERVERNAME` on [the online terminal](https://krymsonwake.github.io/email_terminal/)
+* hide clues in emails to figure other users **logins** & **passwords**, and also what other **servers** exist!
+* use [Zalgo text](https://en.wikipedia.org/wiki/Zalgo_text), like [@JAMacera](https://github.com/JAMacera/email_terminal/blob/master/config/database.json) did
+
+Please suggest additions to this list based on your own usage,
+through a GitHub issue/PR or by contacting the author on Reddit.
+
 ## Acknowledgement
 - Base code inspired by @AndrewBarfield, https://codepen.io/AndrewBarfield HTML5 Web Terminal.
 
