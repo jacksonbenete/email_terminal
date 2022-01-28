@@ -7,8 +7,5 @@
         "userId": "user",
         "password": "",
         "userName": "visitor"
-    },
-    "randomSeed": false,
-    
-    "latestKernel": true
+    }
 }

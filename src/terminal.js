@@ -31,6 +31,7 @@ var Terminal = Terminal || function() {
 	var history_ = []
 	var histpos_ = 0
 	var histtemp_ = 0
+	loadHistoryFromLocalStorage()
 
 	// Recover focus on terminal
 	window.addEventListener('click', function(e) {
@@ -120,6 +121,7 @@ var Terminal = Terminal || function() {
 			if (this.value) {
 				history_[history_.length] = this.value
 				histpos_ = history_.length
+				saveHistoryToLocalStorage()
 			}
 
 			// Duplicate current input and append to output section.
@@ -166,6 +168,23 @@ var Terminal = Terminal || function() {
 		}
 	}
 
+	function loadHistoryFromLocalStorage(initialHistory) {
+		var historyStr = localStorage.getItem('history_' + serverDatabase.serverAddress + '_' + userDatabase.userId, history_.join('\n'))
+		if (historyStr) {
+			history_ = historyStr.split('\n')
+		} else if (initialHistory) {
+			var userInitialHistory = initialHistory[userDatabase.userId]
+			history_ = userInitialHistory || []
+		} else {
+			history_ = []
+		}
+		histpos_ = history_.length
+	}
+
+	function saveHistoryToLocalStorage() {
+		localStorage.setItem('history_' + serverDatabase.serverAddress + '_' + userDatabase.userId, history_.join('\n'))
+	}
+
 	/**
 	 * This function isn't used in the code and I don't know what the original author would want to use it for.
 	 * Maybe, it's for a never implemented `ls` function to list directory files and details.
@@ -193,12 +212,13 @@ var Terminal = Terminal || function() {
 	}
 
 	/**
-	 * This will automatically output the hearder when the object initialize (constructor?).
+	 * This will automatically output the header when the object initialize (constructor?).
 	 */
 	return {
 		init: function() {
 			setHeader()
 		},
+		loadHistoryFromLocalStorage: loadHistoryFromLocalStorage,
 		output: output
 	}
 }
@@ -210,7 +230,7 @@ $(function() {
 	// Initializing Terminal Object
 	kernel.init('#input-line .cmdline', '#container output')
 		.then(function() {
-			var term = new Terminal()
+			term = new Terminal()
 			term.init()
 		})
 })
