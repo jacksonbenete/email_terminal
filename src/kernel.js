@@ -30,7 +30,8 @@ function setHeader(msg = '') {
     <p>Logged in: ` + serverDatabase.serverAddress + ` ( ` + date_final + ` ) </p>
     <p>Enter "help" for more information.</p>
     `
-	system.clear()
+	output_.innerHTML = '';
+	cmdLine_.value = '';
 	output([header, msg])
 	$('.prompt').html(prompt_text)
 }
@@ -219,8 +220,7 @@ var system = {
 
 	clear: function() {
 		return new Promise(function(resolve, reject) {
-			output_.innerHTML = ''
-			cmdLine_.value = ''
+			setHeader();
 			resolve(false)
 		})
 	},
@@ -458,11 +458,13 @@ var software = function(app, args) {
 					appFiletype == softwareInfo.filetype &&
 					(softwareInfo.location.includes(serverDatabase.serverAddress) || softwareInfo.location.includes("all")) &&
 					(!softwareInfo.protection || softwareInfo.protection.includes(userDatabase.userId))
-				)
+				) {
+					if (softwareInfo.clear)
+						system.clear()
 					resolve({text: softwareInfo.message, delayed: softwareInfo.delayed})
-				
-				else
+				} else {
 					reject(new CommandNotFoundError(app))
+				}
 				
 			})
 			.fail(function() {

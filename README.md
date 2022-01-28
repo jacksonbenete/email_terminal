@@ -157,12 +157,13 @@ At the moment you can just create simple software that will output some messages
 You just need to create a file with the name of the software terminating with `.json`.
 After setting everything up, you can just use it as the defined name.filetype (i.e. `cdata.exe` command defined in `cdata.json`).
 
-- filename: the name of the file as metadata; this needs to be the same as the actual filename terminating as `.json` in the software folder
-- filetype: this is where you decide the file extension to call at the terminal
-- location: here you can specify which servers will have access to the software (where it is installed); you need to specify at least `localhost` if you want it to run in the main terminal
-- protection: this is where you specify who can have access to the software, that is, which users have it installed (or which players have found it to use)
-- delayed: this will create an effect to each message to be slowly printed at terminal, the number is in milliseconds
-- message: the actual message to be displayed as an emulation of the software running
+- `filename`: the name of the file as metadata; this needs to be the same as the actual filename terminating as `.json` in the software folder
+- `filetype`: this is where you decide the file extension to call at the terminal
+- `location`: here you can specify which servers will have access to the software (where it is installed); you need to specify at least `localhost` if you want it to run in the main terminal
+- `protection`: this is where you specify who can have access to the software, that is, which users have it installed (or which players have found it to use)
+- `clear` (optional): clear the screen before displaying the program output
+- `delayed` (optional): this will create an effect to each message to be slowly printed at terminal, the number is in milliseconds
+- `message`: the actual message to be displayed as an emulation of the software running
 
 Note that you can set `protection` as `false` (boolean) if you want any user to access the software, and you can set `location` as `"all"` if you want every server to have access on it.
 
