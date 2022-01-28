@@ -168,6 +168,12 @@ var Terminal = Terminal || function() {
 		}
 	}
 
+	/**
+	 * Load the commands history from localStorage, or else from `initialHistory` if provided.
+	 * Sets the global variables `history_` & `histpos_`
+	 * 
+	 * @param {Array} initialHistory optional initial list of comamnd strings
+	 */
 	function loadHistoryFromLocalStorage(initialHistory) {
 		var historyStr = localStorage.getItem('history_' + serverDatabase.serverAddress + '_' + userDatabase.userId, history_.join('\n'))
 		if (historyStr) {
@@ -181,6 +187,9 @@ var Terminal = Terminal || function() {
 		histpos_ = history_.length
 	}
 
+	/**
+	 * Dump the current user commands history to localStorage.
+	 */
 	function saveHistoryToLocalStorage() {
 		localStorage.setItem('history_' + serverDatabase.serverAddress + '_' + userDatabase.userId, history_.join('\n'))
 	}
