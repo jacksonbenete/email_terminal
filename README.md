@@ -214,6 +214,7 @@ Note that you can set `protection` as `false` (boolean) if you want any user to 
 ```
 
 You can also include **images** among the content displayed:
+
 ```json
     "message": [
         "We will conquer...",
@@ -221,6 +222,8 @@ You can also include **images** among the content displayed:
         "THE WORLD!"
     ]
 ```
+
+![](docs/software-image.png)
 
 ## Login, Mail & Read Functions
 
