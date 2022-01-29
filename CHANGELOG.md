@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - `software` programs `messages` can now include **images**
+- Storing the commands history in the browser `localStorage`
+- allowing to configure the initial content of a user commands history
 
 ### Fixed
 - `delayed` configuration entry for `software` programs is now working correctly

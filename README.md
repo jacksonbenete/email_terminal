@@ -5,7 +5,7 @@
 This is a simple, read-only, terminal experience for tabletop RPGs.
 You can fork the project and change the code for your own configurations, like terminal name (or sector/station/node if sci-fi), image and messages.
 
-The database is a simple JSON structured file.
+The database is a simple set of JSON files.
 
 You can host it on Github Pages for a free and fast experience and can share the link for your friends and players to use.
 
@@ -71,12 +71,16 @@ The `network` folder is where every server available needs to be. This is where 
 
 You need to create a folder with the name of the server address if you want to connect to custom servers.
 
-Each server will have a distinct user list, mail messages, and server files. That is, you can't access data of a user configured on `database.json` while you're at another server.
+Each server will have a distinct user list, mail messages, and server files.
+That is, you can't access data of a user configured on `mailserver.json` while you're at another server.
 
 ### manifest.json
 
 The basic configuration at `manifest.json` is what you need to change to customize your terminal.
-You can change the terminal year date, the server name, a customized icon, the terminal identification (this is what is written just before the cursor), as well as the default user id and name (normally this will be "user", but it can be whatever you want) and if you want a random number to be displayed right in front of the default username (randomSeed). Note however that, once you login to the server, the username will change.
+You can change the terminal year date, the server name, a customized icon, the terminal identification
+(this is what is written just before the cursor), as well as the default user id and name (normally this will be "user",
+but it can be whatever you want) and if you want a random number to be displayed right in front of the default username (`randomSeed`).
+Note however that, once you login to the server, the username will change.
 
 ```json
 {
@@ -248,6 +252,27 @@ Note the change in the terminal username
 How to list and read mails
 
 ![Mail and Read functions.](docs/mail_n_read.png)
+
+### History
+
+Each command a logged-in user submit is stored in an history.
+This history of commands can be accessed with the **UP & DOWN arrows**.
+
+Virtually, each user on each server has a distinct history.
+By default, the history of commands of each user is initialy empty.
+You can however specify its initial command in the `manifest.json`, per `userId`:
+```json
+    "initialHistory": {
+        "user": [
+            "login admin@admin"
+        ],
+        "admin": [
+            "ping fbi.gov"
+        ]
+    }
+```
+In reality, the history of commands a player enters is only saved in their browser [localStorage](https://developer.mozilla.org/fr/docs/Web/API/Window/localStorage).
+
 
 ### Other Functions
 

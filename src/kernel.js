@@ -19,12 +19,13 @@ function debugObject(obj) {
  */
 function setHeader(msg = '') {
 	// Setting correct header icon and terminal name
+	var promptText = ''
 	if (serverDatabase.randomSeed && !logged)
-		prompt_text = '[' + userDatabase.userName + date.getTime() + '@' + serverDatabase.terminalID + '] # '
+		promptText = '[' + userDatabase.userName + date.getTime() + '@' + serverDatabase.terminalID + '] # '
 	else
-		prompt_text = '[' + userDatabase.userName + '@' + serverDatabase.terminalID + '] # '
+		promptText = '[' + userDatabase.userName + '@' + serverDatabase.terminalID + '] # '
 
-	header = `
+	var header = `
     <img align="left" src="config/network/` + serverDatabase.serverAddress + `/` + serverDatabase.iconName + `" width="100" height="100" style="padding: 0px 10px 20px 0px">
     <h2 style="letter-spacing: 4px">` + serverDatabase.serverName + `</h2>
     <p>Logged in: ` + serverDatabase.serverAddress + ` ( ` + date_final + ` ) </p>
@@ -32,8 +33,10 @@ function setHeader(msg = '') {
     `
 	output_.innerHTML = '';
 	cmdLine_.value = '';
+	if (term)
+		term.loadHistoryFromLocalStorage(serverDatabase.initialHistory)
 	output([header, msg])
-	$('.prompt').html(prompt_text)
+	$('.prompt').html(promptText)
 }
 
 /**
@@ -359,7 +362,8 @@ var system = {
 			if (!userFound)
 				return reject(new UsernameIsEmptyError)
 			
-			resolve(setHeader('Login successful'))
+			setHeader('Login successful')
+			resolve()
 		})
 
 	},
@@ -371,7 +375,8 @@ var system = {
 
 			logged = false
 			userDatabase = serverDatabase.defaultUser
-			resolve(setHeader('Logout completed'))
+			setHeader('Logout completed')
+			resolve()
 		})
 	},
 
@@ -447,7 +452,8 @@ var system = {
 				kernel.getDatabases()
 			})
 			.done(function(){
-				resolve(setHeader('Connection successful'))
+				setHeader('Connection successful')
+				resolve()
 			})
 			.fail(function(){
 				reject(new AddressNotFoundError(args))

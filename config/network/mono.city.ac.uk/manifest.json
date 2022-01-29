@@ -7,8 +7,5 @@
         "userId": "user",
         "password": "",
         "userName": "anon"
-    },
-    "randomSeed": false,
-    
-    "latestKernel": true
+    }
 }

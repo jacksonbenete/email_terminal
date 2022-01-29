@@ -8,7 +8,5 @@
         "password": "",
         "userName": "anonymous"
     },
-    "randomSeed": true,
-    
-    "latestKernel": true
+    "randomSeed": true
 }
