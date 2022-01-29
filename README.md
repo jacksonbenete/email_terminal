@@ -9,6 +9,31 @@ The database is a simple JSON structured file.
 
 You can host it on Github Pages for a free and fast experience and can share the link for your friends and players to use.
 
+<!-- To update this Table Of Contents:
+    markdown-toc -i README.md
+-->
+
+<!-- toc -->
+
+- [Latest News](#latest-news)
+- [How to Configure](#how-to-configure)
+- [Customization](#customization)
+  * [manifest.json](#manifestjson)
+  * [userlist.json](#userlistjson)
+  * [mailserver.json](#mailserverjson)
+  * [Software](#software)
+- [Login, Mail & Read Functions](#login-mail--read-functions)
+  * [Other Functions](#other-functions)
+- [How to Install](#how-to-install)
+  * [How to Configure for localhost](#how-to-configure-for-localhost)
+- [Future of the Project](#future-of-the-project)
+- [Customization / what to do with this](#customization--what-to-do-with-this)
+- [Acknowledgement](#acknowledgement)
+  * [Icons Acknowledgement](#icons-acknowledgement)
+  * [Icons Acknowledgement (not included)](#icons-acknowledgement-not-included)
+
+<!-- tocstop -->
+
 ## Latest News
 
 You can now configure and access extra servers at `network.json` to login via telnet.
@@ -279,4 +304,4 @@ through a GitHub issue/PR or by contacting the author on Reddit.
 - fbi.png icon by: https://iconscout.com/contributors/icon-mafia
 
 ### Icons Acknowledgement (not included)
-- (non-free) DNA icon by: https://www.iconfinder.com/icons/378473/dna_icon 
+- (non-free) DNA icon by: https://www.iconfinder.com/icons/378473/dna_icon
