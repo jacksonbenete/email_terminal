@@ -22,7 +22,8 @@ You can host it on Github Pages for a free and fast experience and can share the
   * [userlist.json](#userlistjson)
   * [mailserver.json](#mailserverjson)
   * [Software](#software)
-- [Login, Mail & Read Functions](#login-mail--read-functions)
+  * [Login, Mail & Read Functions](#login-mail--read-functions)
+  * [History](#history)
   * [Other Functions](#other-functions)
 - [How to Install](#how-to-install)
   * [How to Configure for localhost](#how-to-configure-for-localhost)
@@ -229,7 +230,7 @@ You can also include **images** among the content displayed:
 
 ![](docs/software-image.png)
 
-## Login, Mail & Read Functions
+### Login, Mail & Read Functions
 
 The main functions are the `mail` and `read` terminal operations.
 

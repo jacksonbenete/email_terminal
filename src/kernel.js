@@ -88,7 +88,7 @@ function output(data) {
 					printLine(value)
 				})
 			}
-		} else {
+		} else if (data) {
 			printLine(data);
 		}
 		resolve(newLine())
