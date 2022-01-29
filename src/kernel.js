@@ -72,22 +72,21 @@ function output(data) {
 	return new Promise(function(resolve, reject) {
 		var delayed = 0;
 
-		if (typeof(data) == 'object' && data.text) {
+		if (typeof(data) === 'object' && data.text) {
 			delayed = data.delayed;
 			data = data.text;
 		}
 
-		if (typeof(data) == 'object') {
+		if (typeof(data) === 'object') {
 			if (delayed && data.length > 0) {
 				outputLinesWithDelay(data, delayed);
 			} else {
 				$.each(data, function(index, value) {
-					output_.insertAdjacentHTML('beforeEnd', '<p>' + value + '</p>')
+					printLine(value)
 				})
 			}
-		}
-		if (typeof(data) == 'string') {
-			output_.insertAdjacentHTML('beforeEnd', '<p>' + data + '</p>')
+		} else {
+			printLine(data);
 		}
 		resolve(newLine())
 
@@ -95,16 +94,35 @@ function output(data) {
 }
 
 /**
- * Print lines of text with some delay between them.
+ * Print lines of content with some delay between them.
  * 
- * @param {Array} lines list of strings to display
+ * @param {Array} lines list of content to display
  * @param {Number} delayed delay in milliseconds between which to display lines
  */
 function outputLinesWithDelay(lines, delayed) {
 	var line = lines.shift();
-	output_.insertAdjacentHTML('beforeEnd', '<p>' + line + '</p>');
+	printLine(line);
 	if (lines.length > 0) {
 		setTimeout(outputLinesWithDelay, delayed, lines, delayed);
+	}
+}
+
+/**
+ * Display some text, or an image, on a new line.
+ * 
+ * @param {String} data text to display
+ * @param {Object} data information on what to display
+ */
+function printLine(data) {
+	if (typeof(data) === 'object') {
+		if (data.type === 'img') {
+			var attributesAsTring = Object.keys(data).map(function (key) {
+				return key + '="' + data[key] + '"';
+			}).join(' ');
+			output_.insertAdjacentHTML('beforeEnd', '<img ' + attributesAsTring + '>')
+		}
+	} else {
+		output_.insertAdjacentHTML('beforeEnd', '<p>' + data + '</p>')
 	}
 }
 
