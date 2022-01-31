@@ -21,7 +21,7 @@ function debugObject( obj ) {
  *
  * @param {String} msg A message to be showed when done
  */
-function setHeader( msg = "" ) {
+function setHeader( msg = "⠀" ) {
     // Setting correct header icon and terminal name
     const date = new Date();
     let promptText = "";
@@ -162,14 +162,14 @@ function kernel( app, args ) {
  */
 kernel.getDatabases = function getDatabases() {
     userDatabase = serverDatabase.defaultUser;
-    $.when(
+    return $.when(
         $.get( `config/network/${ serverDatabase.serverAddress }/userlist.json`, ( list ) => {
             userList = list;
         } ),
         $.get( `config/network/${ serverDatabase.serverAddress }/mailserver.json`, ( list ) => {
             mailList = list;
         } )
-    ).then( () => ( true ) );
+    );
 };
 
 /**
@@ -185,10 +185,15 @@ kernel.init = function init( cmdLineContainer, outputContainer ) {
         cmdLine_ = document.querySelector( cmdLineContainer );
         output_ = document.querySelector( outputContainer );
 
-        $.get( "config/network/localhost/manifest.json", ( configuration ) => {
-            serverDatabase = configuration;
-            kernel.getDatabases();
-        } )
+        $.when(
+            $.get( "config/software.json", ( softwareData ) => {
+                softwareInfo = softwareData;
+            } ),
+            $.get( "config/network/localhost/manifest.json", ( configuration ) => {
+                serverDatabase = configuration;
+                return kernel.getDatabases();
+            } )
+        )
             .done( () => {
                 resolve( true );
             } );
@@ -244,36 +249,41 @@ system = {
 
     help( args ) {
         return new Promise( ( resolve ) => {
-            const COMMANDS = [ "clear", "date", "echo", "help", "login", "mail", "read", "ping", "telnet" ];
+            const programs = allowedSoftwares();
             if ( args.length === 0 ) {
-                resolve( [ "You can read the help of a specific command by entering as follows: 'help commandName'", "List of useful commands:", `<div class="ls-files">${ COMMANDS.join( "<br>" ) }</div>` ] );
-            }
-            if ( args[ 0 ] === "clear" ) {
-                resolve( [ "Usage:", "> clear", "The clear command will completely wipeout the entire screen, but it will not affect the history or whatever have been made into the terminal." ] );
-            }
-            if ( args[ 0 ] === "echo" ) {
-                resolve( [ "Usage:", "> echo args", "The echo command will print args into terminal." ] );
-            }
-            if ( args[ 0 ] === "login" ) {
-                resolve( [ "Usage:", "> login username@password", "If you're a registered user into the server, you can login to access your data files and messages." ] );
-            }
-            if ( args[ 0 ] === "read" ) {
-                resolve( [ "Usage:", "> read x", "If you're logged in you can read your mail messages if any." ] );
-            }
-            if ( args[ 0 ] === "telnet" ) {
-                resolve( [ "Usage:", "> telnet address", "> telnet address@password", "You can connect to a valid address to access a specific server if the server is at internet.", "Intranet servers can only be accessed locally.", "You may need a password if it isn't a public server." ] );
-            }
-            if ( args[ 0 ] === "date" ) {
+                const commands = Object.keys( system ).filter( ( cmd ) => cmd !== "dumpdb" );
+                Array.prototype.push.apply( commands, Object.keys( programs ) );
+                commands.sort();
+                resolve( [ "You can read the help of a specific command by entering as follows: 'help commandName'", "List of useful commands:", `<div class="ls-files">${ commands.join( "<br>" ) }</div>` ] );
+            } else if ( args[ 0 ] === "clear" ) {
+                resolve( [ "Usage:", "> clear", "The clear command will completely wipeout the entire screen, but it will not affect the history." ] );
+            } else if ( args[ 0 ] === "date" ) {
                 resolve( [ "Usage:", "> date", "The date command will print the current date-time into terminal." ] );
-            }
-            if ( args[ 0 ] === "help" ) {
-                resolve( [ "Usage:", "> help", "The default help message.", "It will show some of the available commands in a server.", "Note that some existent commands may not have been show at help message." ] );
-            }
-            if ( args[ 0 ] === "mail" ) {
+            } else if ( args[ 0 ] === "echo" ) {
+                resolve( [ "Usage:", "> echo args", "The echo command will print args into terminal." ] );
+            } else if ( args[ 0 ] === "help" ) {
+                resolve( [ "Usage:", "> help", "The default help message. It will show some of the available commands in a server." ] );
+            } else if ( args[ 0 ] === "login" ) {
+                resolve( [ "Usage:", "> login username@password", "If you're a registered user into the server, you can login to access your data files and messages." ] );
+            } else if ( args[ 0 ] === "logout" ) {
+                resolve( [ "Usage:", "> logout", "If you are logged in, log you out as an anonymous user." ] );
+            } else if ( args[ 0 ] === "mail" ) {
                 resolve( [ "Usage:", "> mail", "If you're logged in you can list your mail messages if any." ] );
-            }
-            if ( args[ 0 ] === "ping" ) {
+            } else if ( args[ 0 ] === "ping" ) {
                 resolve( [ "Usage:", "> ping address", "The ping command will try to reach a valid address.", "If the ping doesn't return a valid response, the address may be incorrect, may not exist or can't be reached locally." ] );
+            } else if ( args[ 0 ] === "read" ) {
+                resolve( [ "Usage:", "> read x", "If you're logged in you can read your mail messages if any." ] );
+            } else if ( args[ 0 ] === "telnet" ) {
+                resolve( [ "Usage:", "> telnet address", "> telnet address@password", "You can connect to a valid address to access a specific server if the server is at internet.", "Intranet servers can only be accessed locally.", "You may need a password if it isn't a public server." ] );
+            } else if ( args[ 0 ] === "whoami" ) {
+                resolve( [ "Usage:", "> whoami", "Display the server you are currently connected to, and the login you are registered with." ] );
+            } else if ( args[ 0 ] in softwareInfo ) {
+                const customProgram = programs[ args[ 0 ] ];
+                if ( customProgram.help ) {
+                    resolve( [ "Usage:", `> ${ args[ 0 ] }`, customProgram.help ] );
+                }
+            } else if ( args[ 0 ] in system && args[ 0 ] !== "dumpdb" ) {
+                console.error( `Missing help message for system command: ${ args[ 0 ] }` );
             }
         } );
     },
@@ -394,7 +404,7 @@ system = {
             $.get( `config/network/${ args }/manifest.json`, ( serverInfo ) => {
                 logged = false;
                 serverDatabase = serverInfo;
-                kernel.getDatabases();
+                return kernel.getDatabases();
             } )
                 .done( () => {
                     setHeader( "Connection successful" );
@@ -410,32 +420,42 @@ system = {
 /**
  * The custom software caller.
  *
- * This will look for custom softwares installed at the `software` folder.
+ * This will look for custom softwares from `software.json`.
  *
  * @param {String} app The software name
  * @param {String} args Args to be handle if any
  */
-software = function software( app ) {
+function software( app ) {
     return new Promise( ( resolve, reject ) => {
-        const appName = app.split( "." )[ 0 ];
-        const appFiletype = app.split( "." )[ 1 ];
-
-        $.get( `config/software/${ appName }.json`, ( softwareInfo ) => {
-            if (
-                appFiletype === softwareInfo.filetype &&
-                    ( softwareInfo.location.includes( serverDatabase.serverAddress ) || softwareInfo.location.includes( "all" ) ) &&
-                    ( !softwareInfo.protection || softwareInfo.protection.includes( userDatabase.userId ) )
-            ) {
-                if ( softwareInfo.clear ) {
-                    system.clear();
-                }
-                resolve( { text: softwareInfo.message, delayed: softwareInfo.delayed } );
+        const program = allowedSoftwares()[ app ];
+        if ( program ) {
+            const result = { text: program.message, delayed: program.delayed };
+            if ( program.clear ) {
+                system.clear().then( () => {
+                    resolve( result );
+                } );
             } else {
-                reject( new CommandNotFoundError( app ) );
+                resolve( result );
             }
-        } )
-            .fail( () => {
-                reject( new CommandNotFoundError( app ) );
-            } );
+        } else {
+            reject( new CommandNotFoundError( app ) );
+        }
     } );
-};
+}
+
+/**
+ * List only details about programs the current user has access on the current server.
+ */
+function allowedSoftwares() {
+    const softwares = {};
+    for ( const app in softwareInfo ) {
+        const program = softwareInfo[ app ];
+        if (
+            ( program.location.includes( serverDatabase.serverAddress ) || program.location.includes( "all" ) ) &&
+            ( !program.protection || program.protection.includes( userDatabase.userId ) )
+        ) {
+            softwares[ app ] = program;
+        }
+    }
+    return softwares;
+}

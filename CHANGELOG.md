@@ -9,9 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## not released yet
 
+### Changed
+- ⚠️ `software` programs are now defined in a single `software.json` file,
+  in order to allow their enumeration for tab-completion & `help` output
+
 ### Added
+- tab-completion of command names
+- `help` now also lists custom `software` programs
 - `software` programs `messages` can now include **images**
-- Storing the commands history in the browser `localStorage`
+- storing the commands history in the browser `localStorage`
 - allowing to configure the initial content of a user commands history
 
 ### Fixed
