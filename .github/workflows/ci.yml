@@ -1,0 +1,29 @@
+name: CI
+
+on:  # cf. https://github.community/t/how-to-trigger-an-action-on-push-or-pull-request-but-not-both/16662
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  check:
+    name: Run check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code 🛎️
+        uses: actions/checkout@v2
+
+      - name: Set up NodeJS 🏗️
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install ⚙️🔧
+        run:  npm install eslint eslint-config-strict
+
+      - name: Running checks ☑
+        run:  node_modules/.bin/eslint --fix src/*.js
