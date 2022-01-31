@@ -67,13 +67,28 @@ function Terminal() {
     /**
      * Prevents the `tab` key to lose/change focus.
      *
-     * @todo Implement tab suggestion
-     *
      * @param {Event} e
      */
     function tabSuggestionHandler_( e ) {
         if ( e.keyCode === 9 ) {
             e.preventDefault();
+            const commands = Object.keys( system ).filter( ( cmd ) => cmd !== "dumpdb" );
+            Array.prototype.push.apply( commands, Object.keys( allowedSoftwares() ) );
+            const matchingProgNames = commands.filter( ( progName ) => progName.startsWith( this.value ) );
+            if ( matchingProgNames.length === 0 ) {
+                return;
+            }
+            // We determine the longest common shared prefix among all matching commands:
+            const minProgNameLength = Math.min( ...matchingProgNames.map( ( progName ) => progName.length ) );
+            let sharedPrefix = "";
+            for ( let i = 0; i < minProgNameLength; i++ ) {
+                const letter = matchingProgNames[ 0 ][ i ];
+                if ( !matchingProgNames.every( ( progName ) => progName[ i ] === letter ) ) {
+                    break;
+                }
+                sharedPrefix += letter;
+            }
+            this.value = sharedPrefix;
         }
     }
 

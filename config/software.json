@@ -1,0 +1,23 @@
+{
+    "analyze": {
+        "help": "Perform a sanity check of the system",
+        "location": ["127.0.0.1", "localhost"],
+        "clear": true,
+        "message": "System successfull analyzed!"
+    },
+    "cdata.exe": {
+        "location": ["127.0.0.1", "localhost"],
+        "protection": ["admin"],
+        "delayed": 2000,
+        "message": [
+            "Corrupting data.",
+            "Corrupting data..",
+            "Corrupting data...",
+            "0% complete",
+            "11% complete",
+            "47% complete",
+            "98% complete",
+            "System successfully corrupted!"
+        ]
+    }
+}
