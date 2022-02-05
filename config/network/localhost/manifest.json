@@ -1,9 +1,9 @@
 {
-    "year": "1978",
+    "year": "XXXX",
     "serverAddress": "localhost",
-    "serverName": "MCI-Mail",
-    "iconName": "images.png",
-    "terminalID": "Y56",
+    "serverName": "Name of Ball",
+    "iconName": "images.jpg",
+    "terminalID": "1",
     "defaultUser": {
         "userId": "user",
         "password": "",
