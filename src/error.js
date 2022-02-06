@@ -56,3 +56,10 @@ class AddressDuplicatedError extends Error {
         this.message = ( `You already is at ${ message }.` );
     }
 }
+
+class JsonFetchParseError extends Error {
+    constructor( message ) {
+        super( message );
+        this.message = message;
+    }
+}

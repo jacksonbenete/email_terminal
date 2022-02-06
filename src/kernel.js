@@ -123,9 +123,14 @@ function outputLinesWithDelay( lines, delayed ) {
  */
 function printLine( data ) {
     if ( typeof( data ) === "object" ) {
+        let endTag = `</${ data.type }>`;
         if ( data.type === "img" ) {
-            const attributesAsTring = Object.keys( data ).map( ( key ) => `${ key }="${ data[ key ] }"` ).join( " " );
-            output_.insertAdjacentHTML( "beforeEnd", `<img ${ attributesAsTring }>` );
+            endTag = "";
+        }
+        const attributesAsTring = Object.keys( data ).map( ( key ) => `${ key }="${ data[ key ] }"` ).join( " " );
+        output_.insertAdjacentHTML( "beforeEnd", `<${ data.type } ${ attributesAsTring }>${ endTag }` );
+        if ( data.type === "img" && ( data.class || "" ).includes( "glitch" ) ) {
+            glitchImage( output_.lastChild );
         }
     } else {
         output_.insertAdjacentHTML( "beforeEnd", `<p>${ data }</p>` );
@@ -169,7 +174,9 @@ kernel.getDatabases = function getDatabases() {
         $.get( `config/network/${ serverDatabase.serverAddress }/mailserver.json`, ( list ) => {
             mailList = list;
         } )
-    );
+    ).fail( ( err, msg, details ) => {
+        console.error( err, msg, details );
+    } );
 };
 
 /**
@@ -181,7 +188,7 @@ kernel.getDatabases = function getDatabases() {
  * @param {Object} outputContainer The output element inside the div#container
  */
 kernel.init = function init( cmdLineContainer, outputContainer ) {
-    return new Promise( ( resolve ) => {
+    return new Promise( ( resolve, reject ) => {
         cmdLine_ = document.querySelector( cmdLineContainer );
         output_ = document.querySelector( outputContainer );
 
@@ -196,6 +203,10 @@ kernel.init = function init( cmdLineContainer, outputContainer ) {
         )
             .done( () => {
                 resolve( true );
+            } )
+            .fail( ( err, msg, details ) => {
+                console.error( err, msg, details );
+                reject( new JsonFetchParseError( msg ) );
             } );
     } );
 };
