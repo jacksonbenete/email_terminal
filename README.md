@@ -232,6 +232,14 @@ You can also include **images** among the content displayed:
     ]
 ```
 
+A ģ̵̛̖̗̘̯͙͍͇̗̏̑̈́̇̓͗̾͛͛̕͝͝l̷̯͇͚̗͚̭̰̾̋̆͌͌̈́̇̿̕͠ì̸̢͔̺̤͉̰̜͓̣̲̺̯͋͊̔̓͌̆͌̂̍͆͆̏͘͝t̵͍̲̀͗͂͌̆̒̇̒͑̍̾̕͝ç̵̨͓̪̗̗̭͓̜̟̄̈́ḣ̷̡̜̰̀͒̇̓̓̍̑̽͊̓̔̎̇ effect can be added to the image by adding the `glitch` CSS class:
+
+```json
+    "message": [
+        {"type": "img", "src": "/config/network/11.152.9.6/tech.jpg", "style": "width: 10rem", "class": "glitch"}
+    ]
+```
+
 ![](docs/software-image.png)
 
 ### Login, Mail & Read Functions
@@ -330,7 +338,7 @@ This section lists ideas to craft the perfect terminal for your game!
   Check out [@KrymsonWake](https://github.com/KrymsonWake/email_terminal/tree/master/config/network) 6 different servers
   by connecting to them with `telnet SERVERNAME` on [the online terminal](https://krymsonwake.github.io/email_terminal/)
 * hide clues in emails to figure other users **logins** & **passwords**, and also what other **servers** exist!
-* use [Zalgo text](https://en.wikipedia.org/wiki/Zalgo_text), like [@JAMacera](https://github.com/JAMacera/email_terminal/blob/master/config/database.json) did
+* use [Z̶̡̼̰͎̬̔̂̇͑ą̵̨̩̖̺̠̹̯͉̇̇̿́̔̍̈́͋̄̈́̕͠ͅl̸̩̗͖͕̺̩͎̠̹̥͕̿̔̃̾̊̓̄͋͝͝g̸͙̺̬̰̙̯̹̼̲̦̔̾̐͑̒͘͝ô̷̯̹̣̖̤͎̿̽̏̆̐͗̾̋̐̚͘̕ text](https://en.wikipedia.org/wiki/Zalgo_text), like [@JAMacera](https://github.com/JAMacera/email_terminal/blob/master/config/database.json) did
 
 Please suggest additions to this list based on your own usage,
 through a GitHub issue/PR or by contacting the author on Reddit.

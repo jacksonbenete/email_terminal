@@ -16,7 +16,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - tab-completion of command names
 - `help` now also lists custom `software` programs
-- `software` programs `messages` can now include **images**
+- `software` programs `messages` can now include **images** 🖼️,
+  with an optional ģ̵̛̖̗̘̯͙͍͇̗̏̑̈́̇̓͗̾͛͛̕͝͝l̷̯͇͚̗͚̭̰̾̋̆͌͌̈́̇̿̕͠ì̸̢͔̺̤͉̰̜͓̣̲̺̯͋͊̔̓͌̆͌̂̍͆͆̏͘͝t̵͍̲̀͗͂͌̆̒̇̒͑̍̾̕͝ç̵̨͓̪̗̗̭͓̜̟̄̈́ḣ̷̡̜̰̀͒̇̓̓̍̑̽͊̓̔̎̇ effect
 - storing the commands history in the browser `localStorage`
 - allowing to configure the initial content of a user commands history
 
