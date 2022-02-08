@@ -256,6 +256,26 @@ A subtle "sync glitch" effect can be added to text by adding the `desync` CSS cl
     ]
 ```
 
+#### Text glow
+
+A "glow" effect can be added to text by adding the `glow` CSS class:
+
+```json
+    "message": [
+        {"type": "p", "content": "⚠ ACHTUNG ⚠", "class": "glow", "style": "font-size: 3em"}
+    ]
+```
+
+#### Text shimmer
+
+A subtle "shimmer" effect can be added to text by adding the `shimmer` CSS class:
+
+```json
+    "message": [
+        {"type": "p", "class": "shimmer", "content": "Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia?"}
+    ]
+```
+
 #### Text hack reveal
 
 A progressive "hackish" reveal effect can be added to text by adding the `hack-reveal` CSS class:

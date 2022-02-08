@@ -14,10 +14,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   in order to allow their enumeration for tab-completion & `help` output
 
 ### Added
+- `software` programs `messages` can now include **images** 🖼️,
+  with an optional glitch effect
+- `software` programs `messages` can now include text with an optional effects:
+  `desync`, `shimmer`, `glow` or `hack-reveal`.
 - tab-completion of command names
 - `help` now also lists custom `software` programs
-- `software` programs `messages` can now include **images** 🖼️,
-  with an optional ģ̵̛̖̗̘̯͙͍͇̗̏̑̈́̇̓͗̾͛͛̕͝͝l̷̯͇͚̗͚̭̰̾̋̆͌͌̈́̇̿̕͠ì̸̢͔̺̤͉̰̜͓̣̲̺̯͋͊̔̓͌̆͌̂̍͆͆̏͘͝t̵͍̲̀͗͂͌̆̒̇̒͑̍̾̕͝ç̵̨͓̪̗̗̭͓̜̟̄̈́ḣ̷̡̜̰̀͒̇̓̓̍̑̽͊̓̔̎̇ effect
 - storing the commands history in the browser `localStorage`
 - allowing to configure the initial content of a user commands history
 
