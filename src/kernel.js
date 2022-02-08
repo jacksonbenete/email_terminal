@@ -134,11 +134,13 @@ function printLine( data ) {
         delete data.options;
         const attributesAsTring = Object.keys( data ).map( ( key ) => `${ key }="${ data[ key ] }"` ).join( " " );
         output_.insertAdjacentHTML( "beforeEnd", `<${ data.type } ${ attributesAsTring }>${ content }${ endTag }` );
-        if ( data.type === "img" && output_.lastChild.classList.contains( "glitch" ) ) {
-            glitchImage( output_.lastChild );
+        const elemInserted = output_.lastChild;
+        elemInserted.dataset.text = content;  // needed for "desync" effect
+        if ( data.type === "img" && elemInserted.classList.contains( "glitch" ) ) {
+            glitchImage( elemInserted );
         }
-        if ( data.type === "p" && output_.lastChild.classList.contains( "hack-reveal" ) ) {
-            hackRevealText( output_.lastChild, options );
+        if ( data.type === "p" && elemInserted.classList.contains( "hack-reveal" ) ) {
+            hackRevealText( elemInserted, options );
         }
     } else {
         output_.insertAdjacentHTML( "beforeEnd", `<p>${ data }</p>` );
