@@ -6,6 +6,7 @@
         "cmdLine_": false,
         "document": false,
         "glitchImage": false,
+        "hackRevealText": false,
         "kernel": false,
         "localStorage": false,
         "logged": true,

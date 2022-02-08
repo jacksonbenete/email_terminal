@@ -232,7 +232,9 @@ You can also include **images** among the content displayed:
     ]
 ```
 
-A ģ̵̛̖̗̘̯͙͍͇̗̏̑̈́̇̓͗̾͛͛̕͝͝l̷̯͇͚̗͚̭̰̾̋̆͌͌̈́̇̿̕͠ì̸̢͔̺̤͉̰̜͓̣̲̺̯͋͊̔̓͌̆͌̂̍͆͆̏͘͝t̵͍̲̀͗͂͌̆̒̇̒͑̍̾̕͝ç̵̨͓̪̗̗̭͓̜̟̄̈́ḣ̷̡̜̰̀͒̇̓̓̍̑̽͊̓̔̎̇ effect can be added to the image by adding the `glitch` CSS class:
+#### Image animations
+
+A ģ̵̛̖̗̘̯͙͍͇̗̏̑̈́̇̓͗̾͛͛̕͝͝l̷̯͇͚̗͚̭̰̾̋̆͌͌̈́̇̿̕͠ì̸̢͔̺̤͉̰̜͓̣̲̺̯͋͊̔̓͌̆͌̂̍͆͆̏͘͝t̵͍̲̀͗͂͌̆̒̇̒͑̍̾̕͝ç̵̨͓̪̗̗̭͓̜̟̄̈́ḣ̷̡̜̰̀͒̇̓̓̍̑̽͊̓̔̎̇ effect can be added to an image by adding the `glitch` CSS class:
 
 ```json
     "message": [
@@ -241,6 +243,16 @@ A ģ̵̛̖̗̘̯͙͍͇̗̏̑̈́̇̓͗̾͛͛̕͝͝l̷̯͇͚̗̾̋̆͌͌̈́̇̿̕͠
 ```
 
 ![](docs/software-image.png)
+
+#### Text animations
+
+A progressive "hackish" reveal effect can be added to text by adding the `hack-reveal` CSS class:
+
+```json
+    "message": [
+        {"type": "p", "content": "All your base are belong to us", "class": "hack-reveal"}
+    ]
+```
 
 ### Login, Mail & Read Functions
 

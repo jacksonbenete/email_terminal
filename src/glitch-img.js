@@ -1,25 +1,36 @@
 // Recipe from: https://codepen.io/tksiiii/pen/xdQgJX
+// License: MIT
 
+/**
+ * Applies a glitch rendering effect to an <img>.
+ *
+ * @param {HTMLImageElement} imgElem a reference to an <img>
+ *
+ * @return {Promise} A Promise resolving to the HTMLCanvasElement inserted
+ */
 function glitchImage( imgElem ) { /* eslint-disable-line no-unused-vars */
-    new p5( ( sketch ) => {
-        // First ensure <img> is loaded, in order to have access to its .width & .height:
-        sketch.loadImage( imgElem.src, ( loadedImg ) => {
-            const canvas = sketch.createCanvas( loadedImg.width * 2, loadedImg.height * 2 );
-            canvas.parent( imgElem.parentNode ); // Positioning canvas
-            // Copy CSS classes from <img>:
-            canvas.elt.classList.add( ...imgElem.classList );
-            // Copy CSS style from <img>:
-            canvas.elt.style = "";
-            Object.values( imgElem.style ).forEach( ( prop ) => {
-                canvas.elt.style[ prop ] = imgElem.style[ prop ];
+    return new Promise( ( resolve ) => {
+        new p5( ( sketch ) => {
+            // First ensure <img> is loaded, in order to have access to its .width & .height:
+            sketch.loadImage( imgElem.src, ( loadedImg ) => {
+                const canvas = sketch.createCanvas( loadedImg.width * 2, loadedImg.height * 2 );
+                canvas.parent( imgElem.parentNode ); // Positioning canvas
+                // Copy CSS classes from <img>:
+                canvas.elt.classList.add( ...imgElem.classList );
+                // Copy CSS style from <img>:
+                canvas.elt.style = "";
+                Object.values( imgElem.style ).forEach( ( prop ) => {
+                    canvas.elt.style[ prop ] = imgElem.style[ prop ];
+                } );
+                imgElem.remove();
+                const glitch = new Glitch( loadedImg, sketch );
+                sketch.draw = () => {
+                    sketch.clear();
+                    sketch.background( 0 ); // fill canvas in black
+                    glitch.show();
+                };
+                resolve( canvas.elt );
             } );
-            imgElem.remove();
-            const glitch = new Glitch( loadedImg, sketch );
-            sketch.draw = () => {
-                sketch.clear();
-                sketch.background( 0 ); // fill canvas in black
-                glitch.show();
-            };
         } );
     } );
 }
