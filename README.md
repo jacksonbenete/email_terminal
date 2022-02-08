@@ -232,6 +232,8 @@ You can also include **images** among the content displayed:
     ]
 ```
 
+![](docs/software-image.png)
+
 #### Image animations
 
 A ģ̵̛̖̗̘̯͙͍͇̗̏̑̈́̇̓͗̾͛͛̕͝͝l̷̯͇͚̗͚̭̰̾̋̆͌͌̈́̇̿̕͠ì̸̢͔̺̤͉̰̜͓̣̲̺̯͋͊̔̓͌̆͌̂̍͆͆̏͘͝t̵͍̲̀͗͂͌̆̒̇̒͑̍̾̕͝ç̵̨͓̪̗̗̭͓̜̟̄̈́ḣ̷̡̜̰̀͒̇̓̓̍̑̽͊̓̔̎̇ effect can be added to an image by adding the `glitch` CSS class:
@@ -242,7 +244,7 @@ A ģ̵̛̖̗̘̯͙͍͇̗̏̑̈́̇̓͗̾͛͛̕͝͝l̷̯͇͚̗̾̋̆͌͌̈́̇̿̕͠
     ]
 ```
 
-![](docs/software-image.png)
+![](docs/demo-image-glitch.gif)
 
 #### Text animations
 
@@ -253,6 +255,8 @@ A progressive "hackish" reveal effect can be added to text by adding the `hack-r
         {"type": "p", "content": "All your base are belong to us", "class": "hack-reveal"}
     ]
 ```
+
+![](docs/demo-text-hack-reveal.gif)
 
 The animation can be fine-tuned through `options`:
 
