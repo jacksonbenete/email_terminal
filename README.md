@@ -254,6 +254,15 @@ A progressive "hackish" reveal effect can be added to text by adding the `hack-r
     ]
 ```
 
+The animation can be fine-tuned through `options`:
+
+```json
+    "message": [
+        {"type": "p", "content": "All your base are belong to us", "class": "hack-reveal",
+         "options": {"alphabet": "uppercase", "iterationsBeforeReveal": 0, "preserveSpaces": true}}
+    ]
+```
+
 ### Login, Mail & Read Functions
 
 The main functions are the `mail` and `read` terminal operations.

@@ -127,15 +127,18 @@ function printLine( data ) {
         if ( data.type === "img" ) {
             endTag = "";
         }
+        data = Object.assign( {}, data );
         const content = data.content || "";
         delete data.content;
+        const options = data.options || {};
+        delete data.options;
         const attributesAsTring = Object.keys( data ).map( ( key ) => `${ key }="${ data[ key ] }"` ).join( " " );
         output_.insertAdjacentHTML( "beforeEnd", `<${ data.type } ${ attributesAsTring }>${ content }${ endTag }` );
         if ( data.type === "img" && output_.lastChild.classList.contains( "glitch" ) ) {
             glitchImage( output_.lastChild );
         }
         if ( data.type === "p" && output_.lastChild.classList.contains( "hack-reveal" ) ) {
-            hackRevealText( output_.lastChild );
+            hackRevealText( output_.lastChild, options );
         }
     } else {
         output_.insertAdjacentHTML( "beforeEnd", `<p>${ data }</p>` );
