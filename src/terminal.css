@@ -115,8 +115,3 @@ body {
   -o-column-width: 100px;
   column-width: 100px;
 }
-
-/* Glitch effects */
-.hack-reveal {
-    text-transform:uppercase;
-}
