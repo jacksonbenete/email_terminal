@@ -1,13 +1,20 @@
 {
-    "analyze": {
-        "help": "Perform a sanity check of the system",
+    "demo.exe": {
+        "help": "Demonstrate some rendering features",
         "location": ["127.0.0.1", "localhost"],
         "clear": true,
-        "message": "System successfull analyzed!"
+        "message": [
+            "<p class='glow' style='font-size: 3em'>⚠ ACHTUNG ⚠</p>",
+            "<p class='desync'>SHADY TROUBLING MESSAGE</p>",
+            "<img src='/config/network/11.152.9.6/tech.jpg' style='width: 10rem' class='glitch'>",
+            "<p class='shimmer'>Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia?</p>",
+            "<p class='hack-reveal' data-alphabet='uppercase' data-iterations-before-reveal=0 data-preserve-spaces='true'>All your base are belong to us</p>"
+        ]
     },
     "cdata.exe": {
         "location": ["127.0.0.1", "localhost"],
         "protection": ["admin"],
+        "secretCommand": true,
         "delayed": 2000,
         "message": [
             "Corrupting data.",
