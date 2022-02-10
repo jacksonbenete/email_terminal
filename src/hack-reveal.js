@@ -15,25 +15,18 @@ const ALPHABETS = {
  */
 function hackRevealText( paragraph, options ) { /* eslint-disable-line no-unused-vars */
     const alphabet = ALPHABETS[ options.alphabet || "ascii" ];
-    const iterationsBeforeReveal = options.iterationsBeforeReveal || 20;
+    const iterationsBeforeReveal = options.iterationsBeforeReveal ? Number( options.iterationsBeforeReveal ) : 20;
     const initialText = paragraph.innerHTML;
-    let canChange = false;
     let globalCount = 0;
     let count = 0;
     paragraph.innerHTML = makeRandText( initialText, alphabet, options.preserveSpaces );
     const interv = setInterval( () => {
-        paragraph.innerHTML = makeRandText( initialText, alphabet, options.preserveSpaces, count, canChange );
-        if ( canChange ) {
+        paragraph.innerHTML = makeRandText( initialText, alphabet, options.preserveSpaces, count );
+        if ( globalCount >= iterationsBeforeReveal ) {
             count++;
         }
-        if ( globalCount >= iterationsBeforeReveal ) {
-            canChange = true;
-        }
-        if ( count >= initialText.length ) {
+        if ( count > initialText.length || !document.body.contains( paragraph ) ) {
             clearInterval( interv );
-            count = 0;
-            canChange = false;
-            globalCount = 0;
         }
         globalCount++;
     }, 50 );
@@ -43,10 +36,10 @@ function getRandLetter( alphabet ) {
     return alphabet[ Math.floor( Math.random() * alphabet.length ) ];
 }
 
-function makeRandText( text, alphabet, preserveSpaces, count, canChange ) {
+function makeRandText( text, alphabet, preserveSpaces, count ) {
     let finalWord = "";
     for ( let i = 0; i < text.length; i++ ) {
-        if ( count && i <= count && canChange ) {
+        if ( i < count ) {
             finalWord += text[ i ];
         } else {
             finalWord += ( preserveSpaces && text[ i ] === " " ) ? " " : getRandLetter( alphabet );

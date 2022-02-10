@@ -73,7 +73,8 @@ function Terminal() {
         if ( e.keyCode === 9 ) {
             e.preventDefault();
             const commands = Object.keys( system ).filter( ( cmd ) => cmd !== "dumpdb" );
-            Array.prototype.push.apply( commands, Object.keys( allowedSoftwares() ) );
+            const programs = allowedSoftwares();
+            Array.prototype.push.apply( commands, Object.keys( programs ).filter( ( pName ) => !programs[ pName ].secretCommand ) );
             const matchingProgNames = commands.filter( ( progName ) => progName.startsWith( this.value ) );
             if ( matchingProgNames.length === 0 ) {
                 return;

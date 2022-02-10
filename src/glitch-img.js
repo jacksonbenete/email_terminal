@@ -11,9 +11,10 @@
 function glitchImage( imgElem ) { /* eslint-disable-line no-unused-vars */
     return new Promise( ( resolve ) => {
         new p5( ( sketch ) => {
+            sketch.pixelDensity(1);  // no need for more, it would impact perfs negatively
             // First ensure <img> is loaded, in order to have access to its .width & .height:
             sketch.loadImage( imgElem.src, ( loadedImg ) => {
-                const canvas = sketch.createCanvas( loadedImg.width * 2, loadedImg.height * 2 );
+                const canvas = sketch.createCanvas( loadedImg.width, loadedImg.height );
                 canvas.parent( imgElem.parentNode ); // Positioning canvas
                 // Copy CSS classes from <img>:
                 canvas.elt.classList.add( ...imgElem.classList );
@@ -35,58 +36,59 @@ function glitchImage( imgElem ) { /* eslint-disable-line no-unused-vars */
     } );
 }
 
+const CHANNEL_LEN = 4; // Constant from the doc: https://p5js.org/reference/#/p5.Image
+const FLOW_LINES_COUNT = 1;
+const SHIFT_LINES_COUNT = 6;
+const SHIFT_RGB_COUNT = 1;
+const SCAT_IMGS_COUNT = 3;
+
 class Glitch {
     constructor( img, p5sketch ) {
-        this.p5 = p5sketch;
-        this.channelLen = 4;
-        this.imgOrigin = img;
-        this.imgOrigin.loadPixels();
-        this.copyData = [];
+        this.p5sketch = p5sketch;
+        this.originalImg = new p5.Image(img.width, img.height);
+        this.originalImg.copy(img, 0, 0, img.width, img.height, 0, 0, img.width, img.height);
+        this.img = img;
+        this.img.loadPixels();
         this.flowLineImgs = [];
         this.shiftLineImgs = [];
         this.shiftRGBs = [];
         this.scatImgs = [];
         this.throughFlag = true;
-        this.copyData = new Uint8ClampedArray( this.imgOrigin.pixels );
 
         // flow line
-        for ( let i = 0; i < 1; i++ ) {
-            const o = {
+        for ( let i = 0; i < FLOW_LINES_COUNT; i++ ) {
+            this.flowLineImgs.push( {
                 pixels: null,
-                t1: this.p5.floor( this.p5.random( 0, 1000 ) ),
-                speed: this.p5.floor( this.p5.random( 4, 24 ) ),
-                randX: this.p5.floor( this.p5.random( 24, 80 ) )
-            };
-            this.flowLineImgs.push( o );
+                t1: p5sketch.floor( p5sketch.random( 0, 1000 ) ),
+                speed: p5sketch.floor( p5sketch.random( 4, 24 ) ),
+                randX: p5sketch.floor( p5sketch.random( 24, 80 ) )
+            } );
         }
 
         // shift line
-        for ( let i = 0; i < 6; i++ ) {
-            const o = null;
-            this.shiftLineImgs.push( o );
+        for ( let i = 0; i < SHIFT_LINES_COUNT; i++ ) {
+            this.shiftLineImgs.push( null );
         }
 
         // shift RGB
-        for ( let i = 0; i < 1; i++ ) {
-            const o = null;
-            this.shiftRGBs.push( o );
+        for ( let i = 0; i < SHIFT_RGB_COUNT; i++ ) {
+            this.shiftRGBs.push( null );
         }
 
         // scat imgs
-        for ( let i = 0; i < 3; i++ ) {
-            const scatImg = {
+        for ( let i = 0; i < SCAT_IMGS_COUNT; i++ ) {
+            this.scatImgs.push( {
                 img: null,
                 x: 0,
                 y: 0
-            };
-            this.scatImgs.push( scatImg );
+            } );
         }
     }
 
-    replaceData( destImg, srcPixels ) {
+    replaceData( destImg, srcPixels ) { /* eslint-disable-line class-methods-use-this */
         for ( let y = 0; y < destImg.height; y++ ) {
             for ( let x = 0; x < destImg.width; x++ ) {
-                const index = ( y * destImg.width + x ) * this.channelLen;
+                const index = ( y * destImg.width + x ) * CHANNEL_LEN;
                 const r = index;
                 const g = index + 1;
                 const b = index + 2;
@@ -97,19 +99,20 @@ class Glitch {
                 destImg.pixels[ a ] = srcPixels[ a ];
             }
         }
-        destImg.updatePixels();
+        // Note (Lucas - 2022/02/09): theorically faster but does not behave the same as the lines above :(
+        // destImg.pixels = new Uint8ClampedArray( srcPixels );
     }
 
     flowLine( srcImg, obj ) {
         const destPixels = new Uint8ClampedArray( srcImg.pixels );
         obj.t1 %= srcImg.height;
         obj.t1 += obj.speed;
-        // const tempY = this.p5.floor(noise(obj.t1) * srcImg.height);
-        const tempY = this.p5.floor( obj.t1 );
+        // const tempY = this.p5sketch.floor(noise(obj.t1) * srcImg.height);
+        const tempY = this.p5sketch.floor( obj.t1 );
         for ( let y = 0; y < srcImg.height; y++ ) {
             if ( tempY === y ) {
                 for ( let x = 0; x < srcImg.width; x++ ) {
-                    const index = ( y * srcImg.width + x ) * this.channelLen;
+                    const index = ( y * srcImg.width + x ) * CHANNEL_LEN;
                     const r = index;
                     const g = index + 1;
                     const b = index + 2;
@@ -125,16 +128,17 @@ class Glitch {
     }
 
     shiftLine( srcImg ) {
+        const sketch = this.p5sketch;
         const destPixels = new Uint8ClampedArray( srcImg.pixels );
         const rangeH = srcImg.height;
-        const rangeMin = this.p5.floor( this.p5.random( 0, rangeH ) );
-        const rangeMax = rangeMin + this.p5.floor( this.p5.random( 1, rangeH - rangeMin ) );
-        const offsetX = this.channelLen * this.p5.floor( this.p5.random( -40, 40 ) );
+        const rangeMin = sketch.floor( sketch.random( 0, rangeH ) );
+        const rangeMax = rangeMin + sketch.floor( sketch.random( 1, rangeH - rangeMin ) );
+        const offsetX = CHANNEL_LEN * sketch.floor( sketch.random( -40, 40 ) );
 
         for ( let y = 0; y < srcImg.height; y++ ) {
             if ( y > rangeMin && y < rangeMax ) {
                 for ( let x = 0; x < srcImg.width; x++ ) {
-                    const index = ( y * srcImg.width + x ) * this.channelLen;
+                    const index = ( y * srcImg.width + x ) * CHANNEL_LEN;
                     const r = index;
                     const g = index + 1;
                     const b = index + 2;
@@ -153,15 +157,16 @@ class Glitch {
     }
 
     shiftRGB( srcImg ) {
+        const sketch = this.p5sketch;
         const range = 16;
         const destPixels = new Uint8ClampedArray( srcImg.pixels );
-        const randR = ( this.p5.floor( this.p5.random( -range, range ) ) * srcImg.width + this.p5.floor( this.p5.random( -range, range ) ) ) * this.channelLen;
-        const randG = ( this.p5.floor( this.p5.random( -range, range ) ) * srcImg.width + this.p5.floor( this.p5.random( -range, range ) ) ) * this.channelLen;
-        const randB = ( this.p5.floor( this.p5.random( -range, range ) ) * srcImg.width + this.p5.floor( this.p5.random( -range, range ) ) ) * this.channelLen;
+        const randR = ( sketch.floor( sketch.random( -range, range ) ) * srcImg.width + sketch.floor( sketch.random( -range, range ) ) ) * CHANNEL_LEN;
+        const randG = ( sketch.floor( sketch.random( -range, range ) ) * srcImg.width + sketch.floor( sketch.random( -range, range ) ) ) * CHANNEL_LEN;
+        const randB = ( sketch.floor( sketch.random( -range, range ) ) * srcImg.width + sketch.floor( sketch.random( -range, range ) ) ) * CHANNEL_LEN;
 
         for ( let y = 0; y < srcImg.height; y++ ) {
             for ( let x = 0; x < srcImg.width; x++ ) {
-                const index = ( y * srcImg.width + x ) * this.channelLen;
+                const index = ( y * srcImg.width + x ) * CHANNEL_LEN;
                 const r = index;
                 const g = index + 1;
                 const b = index + 2;
@@ -180,85 +185,83 @@ class Glitch {
     }
 
     getRandomRectImg( srcImg ) {
-        const startX = this.p5.floor( this.p5.random( 0, srcImg.width - 30 ) );
-        const startY = this.p5.floor( this.p5.random( 0, srcImg.height - 50 ) );
-        const rectW = this.p5.floor( this.p5.random( 30, srcImg.width - startX ) );
-        const rectH = this.p5.floor( this.p5.random( 1, 50 ) );
+        const sketch = this.p5sketch;
+        const startX = sketch.floor( sketch.random( 0, srcImg.width - 30 ) );
+        const startY = sketch.floor( sketch.random( 0, srcImg.height - 50 ) );
+        const rectW = sketch.floor( sketch.random( 30, srcImg.width - startX ) );
+        const rectH = sketch.floor( sketch.random( 1, 50 ) );
         const destImg = srcImg.get( startX, startY, rectW, rectH );
         destImg.loadPixels();
         return destImg;
     }
 
     show() {
-        const sketch = this.p5;
+        // const showStartTime = window.performance.now();
+        const sketch = this.p5sketch;
+        const width = this.img.width;
+        const height = this.img.height;
 
         // restore the original state
-        this.replaceData( this.imgOrigin, this.copyData );
+        this.img.copy(this.originalImg, 0, 0, width, height, 0, 0, width, height);
 
         // sometimes pass without effect processing
-        const n = this.p5.floor( this.p5.random( 100 ) );
+        const n = sketch.floor( sketch.random( 100 ) );
         if ( n > 75 && this.throughFlag ) {
             this.throughFlag = false;
             setTimeout( () => {
                 this.throughFlag = true;
-            }, this.p5.floor( this.p5.random( 40, 400 ) ) );
+            }, sketch.floor( sketch.random( 40, 400 ) ) );
         }
 
-        const width = this.imgOrigin.width;
-        const height = this.imgOrigin.height;
-
         if ( !this.throughFlag ) {
-            sketch.push();
-            sketch.translate( ( width - this.imgOrigin.width ) / 2, ( height - this.imgOrigin.height ) / 2 );
-            sketch.image( this.imgOrigin, 0, 0 );
-            sketch.pop();
+            this.img.updatePixels();
+            sketch.image( this.img, 0, 0 );
             return;
         }
 
         // flow line
         this.flowLineImgs.forEach( ( v, i, arr ) => {
-            arr[ i ].pixels = this.flowLine( this.imgOrigin, v );
+            arr[ i ].pixels = this.flowLine( this.img, v );
             if ( arr[ i ].pixels ) {
-                this.replaceData( this.imgOrigin, arr[ i ].pixels );
+                this.replaceData( this.img, arr[ i ].pixels );
             }
         } );
 
         // shift line
         this.shiftLineImgs.forEach( ( _, i, arr ) => {
-            if ( this.p5.floor( this.p5.random( 100 ) ) > 50 ) {
-                arr[ i ] = this.shiftLine( this.imgOrigin );
-                this.replaceData( this.imgOrigin, arr[ i ] );
+            if ( sketch.floor( sketch.random( 100 ) ) > 50 ) {
+                arr[ i ] = this.shiftLine( this.img );
+                this.replaceData( this.img, arr[ i ] );
             } else if ( arr[ i ] ) {
-                this.replaceData( this.imgOrigin, arr[ i ] );
+                this.replaceData( this.img, arr[ i ] );
             }
         } );
 
         // shift rgb
         this.shiftRGBs.forEach( ( _, i, arr ) => {
-            if ( this.p5.floor( this.p5.random( 100 ) ) > 65 ) {
-                arr[ i ] = this.shiftRGB( this.imgOrigin );
-                this.replaceData( this.imgOrigin, arr[ i ] );
+            if ( sketch.floor( sketch.random( 100 ) ) > 65 ) {
+                arr[ i ] = this.shiftRGB( this.img );
+                this.replaceData( this.img, arr[ i ] );
             }
         } );
 
-        sketch.push();
-        sketch.translate( ( width - this.imgOrigin.width ) / 2, ( height - this.imgOrigin.height ) / 2 );
-        sketch.image( this.imgOrigin, 0, 0 );
-        sketch.pop();
+        sketch.image( this.img, 0, 0 );
 
         // scat image
         this.scatImgs.forEach( ( obj ) => {
-            sketch.push();
-            sketch.translate( ( width - this.imgOrigin.width ) / 2, ( height - this.imgOrigin.height ) / 2 );
-            if ( this.p5.floor( this.p5.random( 100 ) ) > 80 ) {
-                obj.x = this.p5.floor( this.p5.random( -this.imgOrigin.width * 0.3, this.imgOrigin.width * 0.7 ) );
-                obj.y = this.p5.floor( this.p5.random( -this.imgOrigin.height * 0.1, this.imgOrigin.height ) );
-                obj.img = this.getRandomRectImg( this.imgOrigin );
+            if ( sketch.floor( sketch.random( 100 ) ) > 80 ) {
+                obj.x = sketch.floor( sketch.random( -width * 0.3,  width * 0.7 ) );
+                obj.y = sketch.floor( sketch.random( -height * 0.1, height ) );
+                obj.img = this.getRandomRectImg( this.img );
             }
             if ( obj.img ) {
                 sketch.image( obj.img, obj.x, obj.y );
             }
-            sketch.pop();
         } );
+
+        this.img.updatePixels();
+
+        // const showDuration = window.performance.now() - showStartTime;
+        // console.debug( `Glitch.show() duration=${ showDuration }ms FPS: ${ sketch.frameRate().toFixed( 2 ) }` );
     }
 }

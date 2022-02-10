@@ -191,6 +191,7 @@ You just need to create a `software.json` file describing your programs:
 - `clear` (optional): clear the screen before displaying the program output
 - `delayed` (optional): this will create an effect to each message to be slowly printed at terminal, the number is in milliseconds
 - `help` (optional): a description of what the program does, that will be displayed by the `help` command
+- `secretCommand` (optional): if set, the program won't be listed in tab-completion & global `help` command output
 - `message`: the actual message to be displayed as an emulation of the software running
 
 Note that you can set `protection` as `false` (boolean) if you want any user to access the software,
@@ -227,7 +228,7 @@ You can also include **images** among the content displayed:
 ```json
     "message": [
         "We will conquer...",
-        {"type": "img", "src": "/config/network/111.222.3.4/world.svg", "style": "width: 10rem"},
+        "<img src='/config/network/111.222.3.4/world.svg' style='width: 10rem'>",
         "THE WORLD!"
     ]
 ```
@@ -239,9 +240,7 @@ You can also include **images** among the content displayed:
 A glitch effect can be added to an image by adding the `glitch` CSS class:
 
 ```json
-    "message": [
-        {"type": "img", "src": "/config/network/11.152.9.6/tech.jpg", "style": "width: 10rem", "class": "glitch"}
-    ]
+"message": "<img src='/config/network/11.152.9.6/tech.jpg' style='width: 10rem' class='glitch'>"
 ```
 
 ![](docs/demo-image-glitch.gif)
@@ -251,9 +250,7 @@ A glitch effect can be added to an image by adding the `glitch` CSS class:
 A subtle "sync glitch" effect can be added to text by adding the `desync` CSS class:
 
 ```json
-    "message": [
-        {"type": "p", "content": "SHADY TROUBLING MESSAGE", "class": "desync"}
-    ]
+"message": "<p class='desync'>SHADY TROUBLING MESSAGE</p>"
 ```
 
 #### Text glow
@@ -261,9 +258,7 @@ A subtle "sync glitch" effect can be added to text by adding the `desync` CSS cl
 A "glow" effect can be added to text by adding the `glow` CSS class:
 
 ```json
-    "message": [
-        {"type": "p", "content": "⚠ ACHTUNG ⚠", "class": "glow", "style": "font-size: 3em"}
-    ]
+    "message": "<p class='glow' style='font-size: 3em'>⚠ ACHTUNG ⚠</p>"
 ```
 
 #### Text shimmer
@@ -271,9 +266,7 @@ A "glow" effect can be added to text by adding the `glow` CSS class:
 A subtle "shimmer" effect can be added to text by adding the `shimmer` CSS class:
 
 ```json
-    "message": [
-        {"type": "p", "class": "shimmer", "content": "Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia?"}
-    ]
+"message": "<p class='shimmer'>Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia?</p>"
 ```
 
 #### Text hack reveal
@@ -281,20 +274,15 @@ A subtle "shimmer" effect can be added to text by adding the `shimmer` CSS class
 A progressive "hackish" reveal effect can be added to text by adding the `hack-reveal` CSS class:
 
 ```json
-    "message": [
-        {"type": "p", "content": "All your base are belong to us", "class": "hack-reveal"}
-    ]
+"message": "<p class='hack-reveal'>All your base are belong to us</p>"
 ```
 
 ![](docs/demo-text-hack-reveal.gif)
 
-The animation can be fine-tuned through `options`:
+The animation can be fine-tuned through `data-` attributes:
 
 ```json
-    "message": [
-        {"type": "p", "content": "All your base are belong to us", "class": "hack-reveal",
-         "options": {"alphabet": "uppercase", "iterationsBeforeReveal": 0, "preserveSpaces": true}}
-    ]
+"message": "<p class='hack-reveal' data-alphabet='uppercase' data-iterations-before-reveal=0 data-preserve-spaces='true'>All your base are belong to us</p>"
 ```
 
 ### Login, Mail & Read Functions

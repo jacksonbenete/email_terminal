@@ -38,6 +38,7 @@ function setHeader( msg = "⠀" ) {
     <p>Logged in: ${ serverDatabase.serverAddress } ( ${ dateStr } ) </p>
     <p>Enter "help" for more information.</p>
     `;
+    // Clear content:
     output_.innerHTML = "";
     cmdLine_.value = "";
     if ( term ) {
@@ -122,29 +123,18 @@ function outputLinesWithDelay( lines, delayed ) {
  * @param {Object} data information on what to display
  */
 function printLine( data ) {
-    if ( typeof( data ) === "object" ) {
-        let endTag = `</${ data.type }>`;
-        if ( data.type === "img" ) {
-            endTag = "";
-        }
-        data = Object.assign( {}, data );
-        const content = data.content || "";
-        delete data.content;
-        const options = data.options || {};
-        delete data.options;
-        const attributesAsTring = Object.keys( data ).map( ( key ) => `${ key }="${ data[ key ] }"` ).join( " " );
-        output_.insertAdjacentHTML( "beforeEnd", `<${ data.type } ${ attributesAsTring }>${ content }${ endTag }` );
-        const elemInserted = output_.lastChild;
-        elemInserted.dataset.text = content;  // needed for "desync" effect
-        if ( data.type === "img" && elemInserted.classList.contains( "glitch" ) ) {
-            glitchImage( elemInserted );
-        }
-        if ( data.type === "p" && elemInserted.classList.contains( "hack-reveal" ) ) {
-            hackRevealText( elemInserted, options );
-        }
-    } else {
-        output_.insertAdjacentHTML( "beforeEnd", `<p>${ data }</p>` );
+    if ( !data.startsWith( "<" ) ) {
+        data = `<p>${ data }</p>`;
     }
+    output_.insertAdjacentHTML( "beforeEnd", data );
+    const elemInserted = output_.lastChild;
+    if ( elemInserted.classList.contains( "glitch" ) ) {
+        glitchImage( elemInserted );
+    }
+    if ( elemInserted.classList.contains( "hack-reveal" ) ) {
+        hackRevealText( elemInserted, elemInserted.dataset );
+    }
+    elemInserted.dataset.text = elemInserted.textContent.trim(); // needed for "desync" effect
 }
 
 /**
@@ -273,7 +263,7 @@ system = {
             const programs = allowedSoftwares();
             if ( args.length === 0 ) {
                 const commands = Object.keys( system ).filter( ( cmd ) => cmd !== "dumpdb" );
-                Array.prototype.push.apply( commands, Object.keys( programs ) );
+                Array.prototype.push.apply( commands, Object.keys( programs ).filter( ( pName ) => !programs[ pName ].secretCommand ) );
                 commands.sort();
                 resolve( [ "You can read the help of a specific command by entering as follows: 'help commandName'", "List of useful commands:", `<div class="ls-files">${ commands.join( "<br>" ) }</div>` ] );
             } else if ( args[ 0 ] === "clear" ) {
