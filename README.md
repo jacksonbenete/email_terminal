@@ -223,7 +223,7 @@ You can also include **images** among the content displayed:
 ```json
     "message": [
         "We will conquer...",
-        "<img src='/config/network/111.222.3.4/world.svg' style='width: 10rem'>",
+        "<img src='config/network/111.222.3.4/world.svg' style='width: 10rem'>",
         "THE WORLD!"
     ]
 ```
@@ -235,7 +235,7 @@ You can also include **images** among the content displayed:
 A glitch effect can be added to an image by adding the `glitch` CSS class:
 
 ```json
-"message": "<img src='/config/network/11.152.9.6/tech.jpg' style='width: 10rem' class='glitch'>"
+"message": "<img src='config/network/11.152.9.6/tech.jpg' style='width: 10rem' class='glitch'>"
 ```
 
 ![](docs/demo-image-glitch.gif)
