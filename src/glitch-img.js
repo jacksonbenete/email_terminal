@@ -11,7 +11,7 @@
 function glitchImage( imgElem ) { /* eslint-disable-line no-unused-vars */
     return new Promise( ( resolve ) => {
         new p5( ( sketch ) => {
-            sketch.pixelDensity(1);  // no need for more, it would impact perfs negatively
+            sketch.pixelDensity( 1 ); // no need for more, it would impact perfs negatively
             // First ensure <img> is loaded, in order to have access to its .width & .height:
             sketch.loadImage( imgElem.src, ( loadedImg ) => {
                 const canvas = sketch.createCanvas( loadedImg.width, loadedImg.height );
@@ -45,8 +45,8 @@ const SCAT_IMGS_COUNT = 3;
 class Glitch {
     constructor( img, p5sketch ) {
         this.p5sketch = p5sketch;
-        this.originalImg = new p5.Image(img.width, img.height);
-        this.originalImg.copy(img, 0, 0, img.width, img.height, 0, 0, img.width, img.height);
+        this.originalImg = new p5.Image( img.width, img.height );
+        this.originalImg.copy( img, 0, 0, img.width, img.height, 0, 0, img.width, img.height );
         this.img = img;
         this.img.loadPixels();
         this.flowLineImgs = [];
@@ -202,7 +202,7 @@ class Glitch {
         const height = this.img.height;
 
         // restore the original state
-        this.img.copy(this.originalImg, 0, 0, width, height, 0, 0, width, height);
+        this.img.copy( this.originalImg, 0, 0, width, height, 0, 0, width, height );
 
         // sometimes pass without effect processing
         const n = sketch.floor( sketch.random( 100 ) );
@@ -250,7 +250,7 @@ class Glitch {
         // scat image
         this.scatImgs.forEach( ( obj ) => {
             if ( sketch.floor( sketch.random( 100 ) ) > 80 ) {
-                obj.x = sketch.floor( sketch.random( -width * 0.3,  width * 0.7 ) );
+                obj.x = sketch.floor( sketch.random( -width * 0.3, width * 0.7 ) );
                 obj.y = sketch.floor( sketch.random( -height * 0.1, height ) );
                 obj.img = this.getRandomRectImg( this.img );
             }

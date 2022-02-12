@@ -1,29 +1,32 @@
 /**
  * Internal logic of terminal.
  *
- * Base code created by @AndrewBarfield, further development by @jacksonbenete.
+ * Base code created by @AndrewBarfield, further development by @jacksonbenete & @Lucas-C.
  * This should contain all the basic code for the terminal behavior.
- *
- * @param {Container} cmdLineContainer  The div where the user will write into
- * @param {Container} outputContainer   The div where the terminal will return information at
  */
 function Terminal() {
-    window.URL = window.URL || window.webkitURL;
-    window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
-
     let history_ = [];
     let histpos_ = 0;
     let histtemp_ = 0;
     loadHistoryFromLocalStorage();
+    addCmdLineListeners();
 
     // Recover focus on terminal
     window.addEventListener( "click", () => {
         cmdLine_.focus();
-    }, false );
+    } );
 
-    cmdLine_.addEventListener( "keydown", historyHandler_, false );
-    cmdLine_.addEventListener( "keydown", processNewCommand_, false );
-    cmdLine_.addEventListener( "keydown", tabSuggestionHandler_, false );
+    function addCmdLineListeners() {
+        cmdLine_.addEventListener( "keydown", historyHandler_ );
+        cmdLine_.addEventListener( "keydown", processNewCommand_ );
+        cmdLine_.addEventListener( "keydown", tabSuggestionHandler_ );
+    }
+
+    function removeCmdLineListeners() {
+        cmdLine_.removeEventListener( "keydown", historyHandler_ );
+        cmdLine_.removeEventListener( "keydown", processNewCommand_ );
+        cmdLine_.removeEventListener( "keydown", tabSuggestionHandler_ );
+    }
 
     /**
      * A function for a `history` function implementation.
@@ -180,6 +183,8 @@ function Terminal() {
         init() {
             setHeader();
         },
+        addCmdLineListeners,
+        removeCmdLineListeners,
         loadHistoryFromLocalStorage,
         output
     };

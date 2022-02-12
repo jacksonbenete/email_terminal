@@ -1,10 +1,16 @@
 {
+    "env": {
+        "browser": true,
+        "node": false
+    },
+    "parserOptions": { "ecmaVersion": 12 },
     "extends": ["strict", "jquery"],
     "globals": {
         "$": false,
         "allowedSoftwares": false,
         "cmdLine_": false,
         "document": false,
+        "dweet": false,
         "glitchImage": false,
         "hackRevealText": false,
         "kernel": false,
@@ -14,6 +20,7 @@
         "output_": false,
         "output": false,
         "p5": false,
+        "requestAnimationFrame": false,
         "software": false,
         "softwareInfo": true,
         "serverDatabase": true,
@@ -23,6 +30,10 @@
         "userDatabase": true,
         "userList": true,
         "window": false,
+        "C": true,
+        "R": true,
+        "S": true,
+        "T": true,
         "AddressDuplicatedError": false,
         "AddressIsEmptyError": false,
         "AddressNotFoundError": false,
@@ -44,6 +55,7 @@
         "line-comment-position": 0,
         "max-len": 0,
         "new-cap": 0,
+        "no-bitwise": 0,
         "no-console": 0,
         "no-inline-comments": 0,
         "no-invalid-this": 0,

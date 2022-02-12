@@ -184,29 +184,24 @@ In the body, you can break the line with a double space.
 You can create your own custom software.
 At the moment you can just create simple software that will output some messages simulating an operation.
 
-You just need to create a `software.json` file describing your programs:
+You just need to create a `software.json` file describing your programs ([example](config/software.json)):
 
-- `location`: here you can specify which servers will have access to the software (where it is installed); you need to specify at least `localhost` if you want it to run in the main terminal
-- `protection` (optional): this is where you specify who can have access to the software, that is, which users have it installed (or which players have found it to use)
+- `message`: the actual message to be displayed as an emulation of the software running
+- `location` (optional): specify which servers will have access to the software (= where it is installed)
+- `protection` (optional): this is where you specify who can have access to the software, that is, which users have it installed
+- `help` (optional): a description of what the program does, that will be displayed by the `help` command
 - `clear` (optional): clear the screen before displaying the program output
 - `delayed` (optional): this will create an effect to each message to be slowly printed at terminal, the number is in milliseconds
-- `help` (optional): a description of what the program does, that will be displayed by the `help` command
 - `secretCommand` (optional): if set, the program won't be listed in tab-completion & global `help` command output
-- `message`: the actual message to be displayed as an emulation of the software running
-
-Note that you can set `protection` as `false` (boolean) if you want any user to access the software,
-and you can set `location` as `"all"` if you want every server to have access on it.
 
 ```json
 {
     "analyze": {
         "help": "Perform a sanity check of the system",
-        "location": ["127.0.0.1", "localhost"],
         "clear": true,
         "message": "System successfull analyzed!"
     },
     "cdata.exe": {
-        "location": ["127.0.0.1", "localhost"],
         "protection": ["admin"],
         "delayed": 2000,
         "message": [
@@ -283,6 +278,51 @@ The animation can be fine-tuned through `data-` attributes:
 
 ```json
 "message": "<p class='hack-reveal' data-alphabet='uppercase' data-iterations-before-reveal=0 data-preserve-spaces='true'>All your base are belong to us</p>"
+```
+
+#### Javascript software programs
+
+Software programs defined through `software.json` are relatively dumb: they always display the same thing.
+
+In order to make programs that can read & check players input for example, programs can also be defined in Javascript.
+Here is how to do so:
+
+1. Add an entry for your program in `software.json`, but omit the `message` field
+2. Add a function in `software.js` that matches the name of your software program
+
+That's it!
+
+The Javascript function will receive command-line options in an optional `args` parameter,
+and this function output will define what gets printed on the terminal after its execution.
+
+Example:
+
+* `software.json`:
+```json
+{
+    "hello": {
+        "help": "Say hello to someone"
+    }
+}
+```
+* `software.js`:
+```javascript
+function hello(args) {
+    const userName = args[0] || 'stranger';
+    return `Nice to meet you ${ userName }!`;
+}
+```
+
+You can now type this in the terminal: `hello Lucas`
+
+Detailed examples are available in [config/software.js](config/software.js).
+The `identify` program demonstrates how to handle interactive user input by having a function returning this type of object:
+```javascript
+{
+    message: // (optional) message to display above the prompt
+    promptText: // (optional) message to display on the left of the prompt (defaults to '>')
+    onInput: // Function to call once the user has submitted their input
+}
 ```
 
 ### Login, Mail & Read Functions

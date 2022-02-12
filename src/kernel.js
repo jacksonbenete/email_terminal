@@ -31,7 +31,7 @@ function setHeader( msg = "⠀" ) {
         promptText = `[${ userDatabase.userName }@${ serverDatabase.terminalID }] # `;
     }
 
-    const dateStr = `${ date.getDay() }/${ date.getMonth() }/${ serverDatabase.year }`;
+    const dateStr = `${ date.getDate() }/${ ( 1 + date.getMonth() ).toString().padStart( 2, "0" ) }/${ serverDatabase.year || ( 1900 + date.getYear() ) }`;
     const header = `
     <img align="left" src="config/network/${ serverDatabase.serverAddress }/${ serverDatabase.iconName }" width="100" height="100" style="padding: 0px 10px 20px 0px">
     <h2 style="letter-spacing: 4px">${ serverDatabase.serverName }</h2>
@@ -89,12 +89,12 @@ function output( data ) {
 
         if ( typeof( data ) === "object" ) {
             if ( delayed && data.length > 0 ) {
-                outputLinesWithDelay( data, delayed );
-            } else {
-                $.each( data, ( _, value ) => {
-                    printLine( value );
-                } );
+                outputLinesWithDelay( data, delayed, () => resolve( newLine() ) );
+                return;
             }
+            $.each( data, ( _, value ) => {
+                printLine( value );
+            } );
         } else if ( data ) {
             printLine( data );
         }
@@ -108,11 +108,13 @@ function output( data ) {
  * @param {Array} lines list of content to display
  * @param {Number} delayed delay in milliseconds between which to display lines
  */
-function outputLinesWithDelay( lines, delayed ) {
+function outputLinesWithDelay( lines, delayed, resolve ) {
     const line = lines.shift();
     printLine( line );
     if ( lines.length > 0 ) {
-        setTimeout( outputLinesWithDelay, delayed, lines, delayed );
+        setTimeout( outputLinesWithDelay, delayed, lines, resolve, delayed );
+    } else if ( resolve ) {
+        resolve();
     }
 }
 
@@ -128,13 +130,18 @@ function printLine( data ) {
     }
     output_.insertAdjacentHTML( "beforeEnd", data );
     const elemInserted = output_.lastChild;
-    if ( elemInserted.classList.contains( "glitch" ) ) {
-        glitchImage( elemInserted );
+    if ( elemInserted.classList ) { // can be undefined if elemInserted is just Text, not an HTMLElement
+        if ( elemInserted.classList.contains( "glitch" ) ) {
+            glitchImage( elemInserted );
+        }
+        if ( elemInserted.classList.contains( "hack-reveal" ) ) {
+            hackRevealText( elemInserted, elemInserted.dataset );
+        }
     }
-    if ( elemInserted.classList.contains( "hack-reveal" ) ) {
-        hackRevealText( elemInserted, elemInserted.dataset );
+    const text = elemInserted.textContent.trim();
+    if ( elemInserted.dataset && text ) { // can be undefined if elemInserted is just Text, not an HTMLElement
+        elemInserted.dataset.text = text; // needed for "desync" effect
     }
-    elemInserted.dataset.text = elemInserted.textContent.trim(); // needed for "desync" effect
 }
 
 /**
@@ -433,23 +440,72 @@ system = {
  *
  * This will look for custom softwares from `software.json`.
  *
- * @param {String} app The software name
- * @param {String} args Args to be handle if any
+ * @param {String} progName The software name
+ * @param {String} args Args to be handled if any
  */
-function software( app ) {
+function software( progName, args ) {
     return new Promise( ( resolve, reject ) => {
-        const program = allowedSoftwares()[ app ];
+        const program = allowedSoftwares()[ progName ];
         if ( program ) {
-            const result = { text: program.message, delayed: program.delayed };
             if ( program.clear ) {
-                system.clear().then( () => {
-                    resolve( result );
-                } );
+                system.clear().then( runSoftware( progName, program, args ).then( resolve, reject ) );
             } else {
-                resolve( result );
+                runSoftware( progName, program, args ).then( resolve, reject );
             }
         } else {
-            reject( new CommandNotFoundError( app ) );
+            reject( new CommandNotFoundError( progName ) );
+        }
+    } );
+}
+
+/**
+ * Run the specified program
+ *
+ * @param {String} progName The software name
+ * @param {Object} program Command definition from sofwtare.json
+ * @param {String} args Args to be handled if any
+ */
+function runSoftware( progName, program, args ) {
+    return new Promise( ( resolve ) => {
+        let msg;
+        if ( program.message ) {
+            msg = { text: program.message, delayed: program.delayed };
+        } else {
+            msg = window[ progName ]( args );
+            if ( typeof( msg ) === "object" ) {
+                if ( !msg.onInput ) {
+                    throw new Error('An onInput callback must be defined!');
+                }
+                if ( msg.message ) {
+                    output( msg.message );
+                }
+                readPrompt( msg.prompt || ">" ).then( ( input ) => msg.onInput( input ) )
+                    .then( ( finalMsg ) => resolve( finalMsg ) );
+                return;
+            }
+        }
+        resolve( msg );
+    } );
+}
+
+/**
+ * Read user input
+ *
+ * @param {String} promptText The text prefix to display before the <input> prompt
+ */
+function readPrompt( promptText ) {
+    return new Promise( ( resolve ) => {
+        const prevPromptText = $( "#input-line .prompt" ).text();
+        $( "#input-line .prompt" ).text( promptText );
+        term.removeCmdLineListeners();
+        cmdLine_.addEventListener( "keydown", promptSubmitted );
+        function promptSubmitted( e ) {
+            if ( e.keyCode === 13 ) {
+                cmdLine_.removeEventListener( "keydown", promptSubmitted );
+                term.addCmdLineListeners();
+                $( "#input-line .prompt" ).text( prevPromptText );
+                resolve( this.value.trim() );
+            }
         }
     } );
 }
@@ -462,11 +518,63 @@ function allowedSoftwares() {
     for ( const app in softwareInfo ) {
         const program = softwareInfo[ app ];
         if (
-            ( program.location.includes( serverDatabase.serverAddress ) || program.location.includes( "all" ) ) &&
+            ( !program.location || program.location.includes( serverDatabase.serverAddress ) || program.location.includes( "all" ) ) &&
             ( !program.protection || program.protection.includes( userDatabase.userId ) )
         ) {
             softwares[ app ] = program;
         }
     }
     return softwares;
+}
+
+/*
+ * Wrapper to easily define sofwtare programs that act as dweets.
+ * Reference code: https://github.com/lionleaf/dwitter/blob/master/dwitter/templates/dweet/dweet.html#L250
+ * Notable difference with https://dwitter.net : default canvas dimensions are width=200 & height=200
+ * There are usage examples in config/software.js
+ */
+const FPS = 60;
+const epsilon = 1.5;
+/* eslint-disable no-unused-vars */
+const C = Math.cos;
+const S = Math.sin;
+const T = Math.tan;
+
+function dweet( u, width, height ) {
+    width = width || 200;
+    height = height || 200;
+    const id = Date.now().toString( 36 );
+    let frame = 0;
+    let nextFrameMs = 0;
+    function loop( frameTime ) {
+        frameTime = frameTime || 0;
+        const c = document.getElementById( id );
+        if ( !c ) {
+            return;
+        }
+        requestAnimationFrame( loop );
+        if ( frameTime < nextFrameMs - epsilon ) {
+            return; // Skip this cycle as we are animating too quickly.
+        }
+        nextFrameMs = Math.max( nextFrameMs + 1000 / FPS, frameTime );
+        let time = frame / FPS;
+        if ( time * FPS | frame - 1 === 0 ) {
+            time += 0.000001;
+        }
+        frame++;
+        const x = c.getContext( "2d" );
+        x.fillStyle = "white";
+        x.strokeStyle = "white";
+        x.beginPath();
+        x.resetTransform();
+        x.clearRect( 0, 0, width, height ); // clear canvas
+        u( time, x, c );
+    }
+    setTimeout( loop, 50 ); // Small delay to let time for the canvas to be inserted
+    return `<canvas id="${ id }" width="${ width }" height="${ height }">`;
+}
+
+function R( r, g, b, a ) {
+    a = typeof a === "undefined" ? 1 : a;
+    return `rgba(${ r | 0 },${ g | 0 },${ b | 0 },${ a })`;
 }
