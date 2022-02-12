@@ -109,10 +109,6 @@ body {
   color: inherit;
 }
 .ls-files {
-  height: 45px;
-  -webkit-column-width: 100px;
-  -moz-column-width: 100px;
-  -o-column-width: 100px;
   column-width: 100px;
 }
 
