@@ -71,23 +71,21 @@ function newLine() {
 }
 
 /**
- * A function to padronize every output/return as a terminal print/echo function.
- *
- * The output function now can handle both String and Array objects.
+ * Display content as terminal output.
  *
  * @param {String} data The string to be returned as a print in terminal
- * @param {Object} data The array to be returned as a print in terminal
+ * @param {Array} data The array to be returned as a print in terminal
  */
 function output( data ) {
     return new Promise( ( resolve ) => {
         let delayed = 0;
 
-        if ( typeof( data ) === "object" && data.text ) {
+        if ( data.constructor === Object ) {
             delayed = data.delayed;
             data = data.text;
         }
 
-        if ( typeof( data ) === "object" ) {
+        if ( data.constructor === Array ) {
             if ( delayed && data.length > 0 ) {
                 outputLinesWithDelay( data, delayed, () => resolve( newLine() ) );
                 return;
@@ -472,9 +470,9 @@ function runSoftware( progName, program, args ) {
             msg = { text: program.message, delayed: program.delayed };
         } else {
             msg = window[ progName ]( args );
-            if ( typeof( msg ) === "object" ) {
+            if ( msg.constructor === Object ) {
                 if ( !msg.onInput ) {
-                    throw new Error('An onInput callback must be defined!');
+                    throw new Error( "An onInput callback must be defined!" );
                 }
                 if ( msg.message ) {
                     output( msg.message );
