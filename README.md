@@ -230,15 +230,17 @@ You can also include **images** among the content displayed:
 
 ![](docs/software-image.png)
 
-#### Image glitch effect
+#### Image effects
 
-A glitch effect can be added to an image by adding the `glitch` CSS class:
+Special effects can be added to images by adding the `glitch` or `particle` CSS classes:
 
 ```json
 "message": "<img src='config/network/11.152.9.6/tech.jpg' style='width: 10rem' class='glitch'>"
 ```
 
 ![](docs/demo-image-glitch.gif)
+
+The [config/software.json](config/software.json) file provided includes demonstrations of those effects in the `demo.exe` command.
 
 #### Text desync
 
@@ -428,6 +430,7 @@ through a GitHub issue/PR or by contacting the author on Reddit.
 
 ## Acknowledgement
 - Base code inspired by @AndrewBarfield, https://codepen.io/AndrewBarfield HTML5 Web Terminal.
+- Hacker image from [Pixabay](https://pixabay.com/de/photos/hacker-silhouette-hacken-hack-3342696/) - CC0
 
 ### Icons Acknowledgement
 - Moon-icon.png by: http://www.iconarchive.com/show/christmas-shadow-2-icons-by-pelfusion/Moon-icon.html and www.pelfusion.com

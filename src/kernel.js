@@ -24,6 +24,9 @@ function debugObject( obj ) {
 function setHeader( msg = "⠀" ) {
     // Setting correct header icon and terminal name
     const date = new Date();
+    if ( serverDatabase.year ) {
+        date.setYear( serverDatabase.year );
+    }
     let promptText = "";
     if ( serverDatabase.randomSeed && !logged ) {
         promptText = `[${ userDatabase.userName }${ date.getTime() }@${ serverDatabase.terminalID }] # `;
@@ -31,7 +34,7 @@ function setHeader( msg = "⠀" ) {
         promptText = `[${ userDatabase.userName }@${ serverDatabase.terminalID }] # `;
     }
 
-    const dateStr = `${ date.getDate() }/${ ( 1 + date.getMonth() ).toString().padStart( 2, "0" ) }/${ serverDatabase.year || ( 1900 + date.getYear() ) }`;
+    const dateStr = `${ date.getDate() }/${ ( 1 + date.getMonth() ).toString().padStart( 2, "0" ) }/${ 1900 + date.getYear() }`;
     const header = `
     <img align="left" src="config/network/${ serverDatabase.serverAddress }/${ serverDatabase.iconName }" width="100" height="100" style="padding: 0px 10px 20px 0px">
     <h2 style="letter-spacing: 4px">${ serverDatabase.serverName }</h2>
@@ -131,6 +134,9 @@ function printLine( data ) {
     if ( elemInserted.classList ) { // can be undefined if elemInserted is just Text, not an HTMLElement
         if ( elemInserted.classList.contains( "glitch" ) ) {
             glitchImage( elemInserted );
+        }
+        if ( elemInserted.classList.contains( "particle" ) ) {
+            particleImage( elemInserted );
         }
         if ( elemInserted.classList.contains( "hack-reveal" ) ) {
             hackRevealText( elemInserted, elemInserted.dataset );
@@ -253,7 +259,11 @@ system = {
 
     date() {
         return new Promise( ( resolve ) => {
-            resolve( String( new Date() ) );
+            const date = new Date();
+            if ( serverDatabase.year ) {
+                date.setYear( serverDatabase.year );
+            }
+            resolve( String( date ) );
         } );
     },
 
