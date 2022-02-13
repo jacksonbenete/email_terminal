@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - new demo commands `target.exe`, `artifact`, `decrypt` & `identify`
 - `software` programs logic can now be defined as Javascript code in `software.js`
-- `software` programs `messages` can now include **images** 🖼️, with an optional `glitch` effect
+- `software` programs `messages` can now include **images** 🖼️, with an optional `glitch` / `particule` effect
 - `software` programs `messages` can now include text with an optional effects:
   `desync`, `shimmer`, `glow` or `hack-reveal`.
 - storing the commands history in the browser `localStorage`

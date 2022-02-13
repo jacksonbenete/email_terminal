@@ -20,6 +20,7 @@
         "output_": false,
         "output": false,
         "p5": false,
+        "particleImage": false,
         "requestAnimationFrame": false,
         "software": false,
         "softwareInfo": true,
