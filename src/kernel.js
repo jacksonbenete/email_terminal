@@ -280,7 +280,13 @@ system = {
                 const commands = Object.keys( system ).filter( ( cmd ) => cmd !== "dumpdb" );
                 Array.prototype.push.apply( commands, Object.keys( programs ).filter( ( pName ) => !programs[ pName ].secretCommand ) );
                 commands.sort();
-                resolve( [ "You can read the help of a specific command by entering as follows: 'help commandName'", "List of useful commands:", `<div class="ls-files">${ commands.join( "<br>" ) }</div>` ] );
+                resolve( [
+                    "You can read the help of a specific command by entering as follows: 'help commandName'",
+                    "List of useful commands:",
+                    `<div class="ls-files">${ commands.join( "<br>" ) }</div>`,
+                    "You can navigate in the commands usage history using the UP & DOWN arrow keys.",
+                    "The TAB key will provide command auto-completion."
+                ] );
             } else if ( args[ 0 ] === "clear" ) {
                 resolve( [ "Usage:", "> clear", "The clear command will completely wipeout the entire screen, but it will not affect the history." ] );
             } else if ( args[ 0 ] === "date" ) {
@@ -296,11 +302,23 @@ system = {
             } else if ( args[ 0 ] === "mail" ) {
                 resolve( [ "Usage:", "> mail", "If you're logged in you can list your mail messages if any." ] );
             } else if ( args[ 0 ] === "ping" ) {
-                resolve( [ "Usage:", "> ping address", "The ping command will try to reach a valid address.", "If the ping doesn't return a valid response, the address may be incorrect, may not exist or can't be reached locally." ] );
+                resolve( [
+                    "Usage:",
+                    "> ping address",
+                    "The ping command will try to reach a valid address.",
+                    "If the ping doesn't return a valid response, the address may be incorrect, may not exist or can't be reached locally."
+                ] );
             } else if ( args[ 0 ] === "read" ) {
                 resolve( [ "Usage:", "> read x", "If you're logged in you can read your mail messages if any." ] );
             } else if ( args[ 0 ] === "telnet" ) {
-                resolve( [ "Usage:", "> telnet address", "> telnet address@password", "You can connect to a valid address to access a specific server if the server is at internet.", "Intranet servers can only be accessed locally.", "You may need a password if it isn't a public server." ] );
+                resolve( [
+                    "Usage:",
+                    "> telnet address",
+                    "> telnet address@password",
+                    "You can connect to a valid address to access a specific server if the server is at internet.",
+                    "Intranet servers can only be accessed locally.",
+                    "You may need a password if it isn't a public server."
+                ] );
             } else if ( args[ 0 ] === "whoami" ) {
                 resolve( [ "Usage:", "> whoami", "Display the server you are currently connected to, and the login you are registered with." ] );
             } else if ( args[ 0 ] in softwareInfo ) {
@@ -526,7 +544,7 @@ function allowedSoftwares() {
     for ( const app in softwareInfo ) {
         const program = softwareInfo[ app ];
         if (
-            ( !program.location || program.location.includes( serverDatabase.serverAddress ) || program.location.includes( "all" ) ) &&
+            ( !program.location || program.location.includes( serverDatabase.serverAddress ) ) &&
             ( !program.protection || program.protection.includes( userDatabase.userId ) )
         ) {
             softwares[ app ] = program;
