@@ -46,6 +46,7 @@
         "UsernameIsEmptyError": false
     },
     "rules": {
+        "array-element-newline": ["error", "consistent"],
         "complexity": 0,
         "id-blacklist": 0,
         "id-match": 0,

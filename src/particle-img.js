@@ -12,50 +12,57 @@ const DETAIL = 1;
  */
 function particleImage( imgElem ) { /* eslint-disable-line no-unused-vars */
     const particulesCount = imgElem.dataset.particules ? Number( imgElem.dataset.particules ) : 5000;
-    imgElem.addEventListener( "load", () => {
-        const canvas = document.createElement( "canvas" );
-        imgElem.parentNode.appendChild( canvas );
-        const ctx = canvas.getContext( "2d" );
-        canvas.width = imgElem.width;
-        canvas.height = imgElem.height;
+    return new Promise( ( resolve ) => {
+        imgElem.addEventListener( "load", () => {
+            const canvas = document.createElement( "canvas" );
+            imgElem.parentNode.appendChild( canvas );
+            const ctx = canvas.getContext( "2d" );
+            canvas.width = imgElem.width;
+            canvas.height = imgElem.height;
 
-        ctx.drawImage( imgElem, 0, 0, canvas.width, canvas.height );
-        imgElem.remove();
-        const pixels = ctx.getImageData( 0, 0, canvas.width, canvas.height );
-        ctx.clearRect( 0, 0, canvas.width, canvas.height );
+            ctx.drawImage( imgElem, 0, 0, canvas.width, canvas.height );
+            imgElem.remove();
+            const pixels = ctx.getImageData( 0, 0, canvas.width, canvas.height );
+            ctx.clearRect( 0, 0, canvas.width, canvas.height );
 
-        const grid = [];
-        for ( let y = 0; y < canvas.height; y += DETAIL ) {
-            const row = [];
-            for ( let x = 0; x < canvas.width; x += DETAIL ) {
-                const red = pixels.data[ ( y * 4 * pixels.width ) + ( x * 4 ) ];
-                const green = pixels.data[ ( y * 4 * pixels.width ) + ( x * 4 + 1 ) ];
-                const blue = pixels.data[ ( y * 4 * pixels.width ) + ( x * 4 + 2 ) ];
-                const color = `rgb(${ red },${ green },${ blue })`;
-                const brightness = calculateBrightness( red, green, blue ) / 100;
-                const cell = [ color, brightness ];
-                row.push( cell );
+            const grid = [];
+            for ( let y = 0; y < canvas.height; y += DETAIL ) {
+                const row = [];
+                for ( let x = 0; x < canvas.width; x += DETAIL ) {
+                    const red = pixels.data[ ( y * 4 * pixels.width ) + ( x * 4 ) ];
+                    const green = pixels.data[ ( y * 4 * pixels.width ) + ( x * 4 + 1 ) ];
+                    const blue = pixels.data[ ( y * 4 * pixels.width ) + ( x * 4 + 2 ) ];
+                    const color = `rgb(${ red },${ green },${ blue })`;
+                    const brightness = calculateBrightness( red, green, blue ) / 100;
+                    const cell = [ color, brightness ];
+                    row.push( cell );
+                }
+                grid.push( row );
             }
-            grid.push( row );
-        }
-        const particlesArray = [];
-        for ( let i = 0; i < particulesCount; i++ ) {
-            particlesArray.push( new Particle( canvas.width, canvas.height ) );
-        }
-
-        function animate() {
-            ctx.globalAlpha = 0.05;
-            ctx.fillStyle = "rgb(0, 0, 0)";
-            ctx.fillRect( 0, 0, canvas.width, canvas.height );
-            ctx.globalAlpha = 0.2;
-            for ( let i = 0; i < particlesArray.length; i++ ) {
-                particlesArray[ i ].update( grid );
-                ctx.globalAlpha = particlesArray[ i ].speed * 0.3;
-                particlesArray[ i ].draw( grid, ctx );
+            const particlesArray = [];
+            for ( let i = 0; i < particulesCount; i++ ) {
+                particlesArray.push( new Particle( canvas.width, canvas.height ) );
             }
-            requestAnimationFrame( animate );
-        }
-        animate();
+
+            function animate() {
+                if ( !document.body.contains( canvas ) ) {
+                    return;
+                }
+                ctx.globalAlpha = 0.05;
+                ctx.fillStyle = "rgb(0, 0, 0)";
+                ctx.fillRect( 0, 0, canvas.width, canvas.height );
+                ctx.globalAlpha = 0.2;
+                for ( let i = 0; i < particlesArray.length; i++ ) {
+                    particlesArray[ i ].update( grid );
+                    ctx.globalAlpha = particlesArray[ i ].speed * 0.3;
+                    particlesArray[ i ].draw( grid, ctx );
+                }
+                requestAnimationFrame( animate );
+            }
+            animate();
+
+            resolve( canvas );
+        } );
     } );
 }
 

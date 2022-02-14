@@ -26,6 +26,10 @@ function glitchImage( imgElem ) { /* eslint-disable-line no-unused-vars */
                 imgElem.remove();
                 const glitch = new Glitch( loadedImg, sketch );
                 sketch.draw = () => {
+                    if ( !document.body.contains( canvas.elt ) ) {
+                        sketch.remove();
+                        return;
+                    }
                     sketch.clear();
                     sketch.background( 0 ); // fill canvas in black
                     glitch.show();
