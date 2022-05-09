@@ -4,7 +4,7 @@
 const DETAIL = 1;
 
 /**
- * Applies a particle rendering effect to an <img>.
+ * Applies a particle rendering effect to an <img>, by transforming it into a <canvas>.
  *
  * @param {HTMLImageElement} imgElem a reference to an <img>
  *
@@ -16,12 +16,19 @@ function particleImage( imgElem ) { /* eslint-disable-line no-unused-vars */
         imgElem.addEventListener( "load", () => {
             const canvas = document.createElement( "canvas" );
             imgElem.parentNode.appendChild( canvas );
-            const ctx = canvas.getContext( "2d" );
             canvas.width = imgElem.width;
             canvas.height = imgElem.height;
-
+            // Copy CSS classes from <img>:
+            canvas.classList.add( ...imgElem.classList );
+            // Copy CSS style from <img>:
+            canvas.style = "";
+            Object.values( imgElem.style ).forEach( ( prop ) => {
+                canvas.style[ prop ] = imgElem.style[ prop ];
+            } );
+            const ctx = canvas.getContext( "2d" );
             ctx.drawImage( imgElem, 0, 0, canvas.width, canvas.height );
             imgElem.remove();
+
             const pixels = ctx.getImageData( 0, 0, canvas.width, canvas.height );
             ctx.clearRect( 0, 0, canvas.width, canvas.height );
 

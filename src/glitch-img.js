@@ -2,7 +2,7 @@
 // License: MIT
 
 /**
- * Applies a glitch rendering effect to an <img>.
+ * Applies a glitch rendering effect to an <img>, by transforming it into a <canvas>.
  *
  * @param {HTMLImageElement} imgElem a reference to an <img>
  *
@@ -23,8 +23,8 @@ function glitchImage( imgElem ) { /* eslint-disable-line no-unused-vars */
                 Object.values( imgElem.style ).forEach( ( prop ) => {
                     canvas.elt.style[ prop ] = imgElem.style[ prop ];
                 } );
-                imgElem.remove();
                 const glitch = new Glitch( loadedImg, sketch );
+                imgElem.remove();
                 sketch.draw = () => {
                     if ( !document.body.contains( canvas.elt ) ) {
                         sketch.remove();
