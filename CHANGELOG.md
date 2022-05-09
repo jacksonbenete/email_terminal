@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## not released yet
 
 ### Added
-- new demo commands `target.exe`, `artifact`, `decrypt` & `identify`
+- new example software programs: `demo.exe`, `target.exe`, `artifact`, `decrypt` & `identify`
 - `software` programs logic can now be defined as Javascript code in `software.js`
 - `software` programs `messages` can now include **images** 🖼️, with an optional `glitch` / `particule` effect
 - `software` programs `messages` can now include text with an optional effects:

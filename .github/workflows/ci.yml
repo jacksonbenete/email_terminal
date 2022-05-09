@@ -23,7 +23,7 @@ jobs:
           node-version: '14'
 
       - name: Install ⚙️🔧
-        run:  npm install eslint eslint-config-strict eslint-config-jquery
+        run:  npm install
 
       - name: Running checks ☑
         run:  node_modules/.bin/eslint --fix src/*.js
