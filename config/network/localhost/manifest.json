@@ -1,13 +1,13 @@
 {
     "year": "XXXX",
-    "serverAddress": "localhost",
-    "serverName": "Name of Ball",
-    "iconName": "images.jpg",
+    "serverAddress": "localnode",
+    "serverName": "Node 56: Copper City",
+    "iconName": "branch.png",
     "terminalID": "1",
     "defaultUser": {
         "userId": "user",
         "password": "",
-        "userName": "#$*(%&!@#&%"
+        "userName": "Bud"
     },
     "randomSeed": true,
     
