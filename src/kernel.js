@@ -156,12 +156,10 @@ function printLine( data ) {
  * @param {Array} args A list of Strings as args
  */
 function kernel( app, args ) {
-    if ( system[ app ] ) {
-        return ( system[ app ]( args ) );
-    } else if ( system[ app.replace( ".", "_" ) ] ) {
-        return ( system[ app.replace( ".", "_" ) ]( args ) );
+    const systemApp = system[ app ] || system[ app.replace( ".", "_" ) ];
+    if ( systemApp ) {
+        return systemApp( args );
     }
-
     return software( app, args );
 }
 
@@ -388,6 +386,18 @@ system = {
             userDatabase = matchingUser;
             setHeader( "Login successful" );
             resolve();
+        } );
+    },
+
+    logout() {
+        return new Promise( () => {
+            location.reload();
+        } );
+    },
+
+    exit() {
+        return new Promise( () => {
+            location.reload();
         } );
     },
 
