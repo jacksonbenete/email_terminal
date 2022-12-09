@@ -37,7 +37,7 @@ You can host it on Github Pages for a free and fast experience and can share the
 
 ## Latest News
 
-You can now configure and access extra servers at `network.json` to login via telnet.
+You can now configure and access extra servers at `network.json` to login via `ssh`.
 Each server will treat their respective users (and mail messages) separately.
 
 ---
@@ -68,7 +68,7 @@ More configuration files will be added when more functionality shows up.
 
 The main server, which is where the terminal will start, is located as `localhost` at `config/network`.
 
-The `network` folder is where every server available needs to be. This is where you can configure new servers to be accessed via the `telnet` command.
+The `network` folder is where every server available needs to be. This is where you can configure new servers to be accessed via the `ssh` command.
 
 You need to create a folder with the name of the server address if you want to connect to custom servers.
 

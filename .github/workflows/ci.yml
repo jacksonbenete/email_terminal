@@ -26,4 +26,4 @@ jobs:
         run:  npm install
 
       - name: Running checks ☑
-        run:  node_modules/.bin/eslint --fix src/*.js
+        run:  npm test

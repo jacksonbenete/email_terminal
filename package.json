@@ -3,5 +3,8 @@
     "eslint": "^8.8.0",
     "eslint-config-jquery": "^3.0.0",
     "eslint-config-strict": "^14.0.1"
+  },
+  "scripts": {
+    "test": "eslint --fix src/*.js"
   }
 }
