@@ -1,5 +1,4 @@
 // Global scope variables
-let logged = false;
 let serverDatabase = {};
 let userDatabase = {};
 let userList = [];
@@ -27,12 +26,7 @@ function setHeader( msg = "⠀" ) {
     if ( serverDatabase.year ) {
         date.setYear( serverDatabase.year );
     }
-    let promptText = "";
-    if ( serverDatabase.randomSeed && !logged ) {
-        promptText = `[${ userDatabase.userName }${ date.getTime() }@${ serverDatabase.terminalID }] # `;
-    } else {
-        promptText = `[${ userDatabase.userName }@${ serverDatabase.terminalID }] # `;
-    }
+    const promptText = `[${ userDatabase.userName }@${ serverDatabase.terminalID }] # `;
 
     const dateStr = `${ date.getDate() }/${ ( 1 + date.getMonth() ).toString().padStart( 2, "0" ) }/${ 1900 + date.getYear() }`;
     const header = `
@@ -83,12 +77,12 @@ function output( data ) {
     return new Promise( ( resolve ) => {
         let delayed = 0;
 
-        if ( data.constructor === Object ) {
+        if ( data && data.constructor === Object ) {
             delayed = data.delayed;
             data = data.text;
         }
 
-        if ( data.constructor === Array ) {
+        if ( data && data.constructor === Array ) {
             if ( delayed && data.length > 0 ) {
                 outputLinesWithDelay( data, delayed, () => resolve( newLine() ) );
                 return;
@@ -168,25 +162,59 @@ function kernel( app, args ) {
         return ( system[ app.replace( ".", "_" ) ]( args ) );
     }
 
-    return ( software( app, args ) );
+    return software( app, args );
 }
 
 /**
- * Recover the correct databases for the current server.
- *
- * Some functions like `system.telnet()` needs to rewrite the databases variables.
+ * Attempts to connect to a server.
+ * If successful, sets global variables serverDatabase / userDatabase / userList / mailList
  */
-kernel.getDatabases = function getDatabases() {
-    userDatabase = serverDatabase.defaultUser;
-    return $.when(
-        $.get( `config/network/${ serverDatabase.serverAddress }/userlist.json`, ( list ) => {
-            userList = list;
-        } ),
-        $.get( `config/network/${ serverDatabase.serverAddress }/mailserver.json`, ( list ) => {
-            mailList = list;
-        } )
-    ).fail( ( err, msg, details ) => {
-        console.error( err, msg, details );
+kernel.connectToServer = function connectToServer( serverAddress, userName, passwd ) {
+    return new Promise( ( resolve, reject ) => {
+        if ( serverAddress === serverDatabase.serverAddress ) {
+            reject( new AlreadyOnServerError( serverAddress ) );
+            return;
+        }
+        $.get( `config/network/${ serverAddress }/manifest.json`, ( serverInfo ) => {
+            if ( !userName && serverInfo.defaultUser ) {
+                serverDatabase = serverInfo;
+                userDatabase = serverInfo.defaultUser;
+                $.get( `config/network/${ serverInfo.serverAddress }/userlist.json`, ( users ) => {
+                    userList = users;
+                } );
+                $.get( `config/network/${ serverInfo.serverAddress }/mailserver.json`, ( mails ) => {
+                    mailList = mails;
+                } );
+                setHeader( "Connection successful" );
+                resolve();
+            } else if ( userName ) {
+                $.get( `config/network/${ serverInfo.serverAddress }/userlist.json`, ( users ) => {
+                    const matchingUser = users.find( ( user ) => user.userId === userName );
+                    if ( !matchingUser ) {
+                        reject( new UnknownUserError( userName ) );
+                        return;
+                    }
+                    if ( matchingUser.password && matchingUser.password !== passwd ) {
+                        reject( new InvalidPasswordError( userName ) );
+                        return;
+                    }
+                    serverDatabase = serverInfo;
+                    userDatabase = matchingUser;
+                    userList = users;
+                    $.get( `config/network/${ serverInfo.serverAddress }/mailserver.json`, ( mails ) => {
+                        mailList = mails;
+                    } );
+                    setHeader( "Connection successful" );
+                    resolve();
+                } ).fail( () => {
+                    reject( new AddressNotFoundError( serverAddress ) );
+                } );
+            } else {
+                reject( new ServerRequireUsernameError( serverAddress ) );
+            }
+        } ).fail( () => {
+            reject( new AddressNotFoundError( serverAddress ) );
+        } );
     } );
 };
 
@@ -207,10 +235,7 @@ kernel.init = function init( cmdLineContainer, outputContainer ) {
             $.get( "config/software.json", ( softwareData ) => {
                 softwareInfo = softwareData;
             } ),
-            $.get( "config/network/localhost/manifest.json", ( configuration ) => {
-                serverDatabase = configuration;
-                return kernel.getDatabases();
-            } )
+            kernel.connectToServer( "localhost" )
         )
             .done( () => {
                 resolve( true );
@@ -296,9 +321,7 @@ system = {
             } else if ( args[ 0 ] === "help" ) {
                 resolve( [ "Usage:", "> help", "The default help message. It will show some of the available commands in a server." ] );
             } else if ( args[ 0 ] === "login" ) {
-                resolve( [ "Usage:", "> login username@password", "If you're a registered user into the server, you can login to access your data files and messages." ] );
-            } else if ( args[ 0 ] === "logout" ) {
-                resolve( [ "Usage:", "> logout", "If you are logged in, log you out as an anonymous user." ] );
+                resolve( [ "Usage:", "> login username:password", "Switch account: log in as another registered user on the server, to access your data files and messages." ] );
             } else if ( args[ 0 ] === "mail" ) {
                 resolve( [ "Usage:", "> mail", "If you're logged in you can list your mail messages if any." ] );
             } else if ( args[ 0 ] === "ping" ) {
@@ -310,14 +333,15 @@ system = {
                 ] );
             } else if ( args[ 0 ] === "read" ) {
                 resolve( [ "Usage:", "> read x", "If you're logged in you can read your mail messages if any." ] );
-            } else if ( args[ 0 ] === "telnet" ) {
+            } else if ( args[ 0 ] === "ssh" ) {
                 resolve( [
                     "Usage:",
-                    "> telnet address",
-                    "> telnet address@password",
-                    "You can connect to a valid address to access a specific server if the server is at internet.",
-                    "Intranet servers can only be accessed locally.",
-                    "You may need a password if it isn't a public server."
+                    "> ssh address",
+                    "> ssh username@address",
+                    "> ssh username:password@address",
+                    "You can connect to a valid address to access a specific server on the Internet.",
+                    "You may need to specify a username if the server has no default user.",
+                    "You may need to specify a password if the user account is protected."
                 ] );
             } else if ( args[ 0 ] === "whoami" ) {
                 resolve( [ "Usage:", "> whoami", "Display the server you are currently connected to, and the login you are registered with." ] );
@@ -328,46 +352,41 @@ system = {
                 }
             } else if ( args[ 0 ] in system && args[ 0 ] !== "dumpdb" ) {
                 console.error( `Missing help message for system command: ${ args[ 0 ] }` );
+            } else {
+                resolve( [ `Unknow command ${ args[ 0 ] }` ] );
             }
         } );
     },
 
     login( args ) {
-        let userFound = false;
-
         return new Promise( ( resolve, reject ) => {
-            if ( args === "" ) {
+            if ( !args ) {
                 reject( new UsernameIsEmptyError() );
                 return;
             }
-            args = args[ 0 ].split( "@" );
-            $.each( userList, ( _, value ) => {
-                if ( args[ 0 ] === value.userId && args[ 1 ] === value.password ) {
-                    userFound = true;
-                    userDatabase = value;
-                    logged = true;
-                }
-            } );
-            if ( !userFound ) {
+            let userName = "";
+            let passwd = "";
+            try {
+                [ userName, passwd ] = userPasswordFrom( args[ 0 ] );
+            } catch ( error ) {
+                reject( error );
+                return;
+            }
+            if ( !userName ) {
                 reject( new UsernameIsEmptyError() );
                 return;
             }
-
+            const matchingUser = userList.find( ( user ) => user.userId === userName );
+            if ( !matchingUser ) {
+                reject( new UnknownUserError() );
+                return;
+            }
+            if ( matchingUser.password && matchingUser.password !== passwd ) {
+                reject( new InvalidPasswordError( userName ) );
+                return;
+            }
+            userDatabase = matchingUser;
             setHeader( "Login successful" );
-            resolve();
-        } );
-    },
-
-    logout() {
-        return new Promise( ( resolve, reject ) => {
-            if ( !logged ) {
-                reject( new LoginIsFalseError() );
-                return;
-            }
-
-            logged = false;
-            userDatabase = serverDatabase.defaultUser;
-            setHeader( "Logout completed" );
             resolve();
         } );
     },
@@ -433,33 +452,50 @@ system = {
         } );
     },
 
-    telnet( args ) {
+    telnet() {
+        return new Promise( ( _, reject ) => {
+            reject( new Error( "telnet is unsecure and is deprecated - use ssh instead" ) );
+        } );
+    },
+
+    ssh( args ) {
         return new Promise( ( resolve, reject ) => {
             if ( args === "" ) {
                 reject( new AddressIsEmptyError() );
                 return;
             }
-
-            if ( args === serverDatabase.serverAddress ) {
-                reject( new AddressDuplicatedError( args ) );
-                return;
+            let userName = "";
+            let passwd = "";
+            let serverAddress = args[ 0 ];
+            if ( serverAddress.includes( "@" ) ) {
+                const splitted = serverAddress.split( "@" );
+                if ( splitted.length !== 2 ) {
+                    reject( new InvalidCommandParameter( "ssh" ) );
+                    return;
+                }
+                serverAddress = splitted[ 1 ];
+                try {
+                    [ userName, passwd ] = userPasswordFrom( splitted[ 0 ] );
+                } catch ( error ) {
+                    reject( error );
+                    return;
+                }
             }
-
-            $.get( `config/network/${ args }/manifest.json`, ( serverInfo ) => {
-                logged = false;
-                serverDatabase = serverInfo;
-                return kernel.getDatabases();
-            } )
-                .done( () => {
-                    setHeader( "Connection successful" );
-                    resolve();
-                } )
-                .fail( () => {
-                    reject( new AddressNotFoundError( args ) );
-                } );
+            kernel.connectToServer( serverAddress, userName, passwd ).then( resolve ).catch( reject );
         } );
     }
 };
+
+function userPasswordFrom( creds ) {
+    if ( !creds.includes( ":" ) ) {
+        return [ creds, "" ];
+    }
+    const splitted = creds.split( ":" );
+    if ( splitted.length !== 2 ) {
+        throw new InvalidCredsSyntaxError();
+    }
+    return splitted;
+}
 
 /**
  * The custom software caller.

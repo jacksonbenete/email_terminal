@@ -1,65 +1,92 @@
 /* eslint no-unused-vars: 0 */
 
 class CommandNotFoundError extends Error {
-    constructor( message ) {
-        super( message );
-        this.name = "CommandNotFoundError";
-        this.message = ( `${ message }: command not found` );
+    constructor( command ) {
+        super();
+        this.message = `${ command }: command not found`;
+    }
+}
+
+class InvalidCommandParameter extends Error {
+    constructor( command ) {
+        super();
+        this.message = `Invalid parameters pased to command ${ command }`;
     }
 }
 
 class AddressNotFoundError extends Error {
-    constructor( message ) {
-        super( message );
-        this.message = ( `Error : address ${ message } can't be reached` );
+    constructor( address ) {
+        super();
+        this.message = `Error : address ${ address } can't be reached`;
     }
 }
 
 class AddressIsEmptyError extends Error {
-    constructor( message ) {
-        super( message );
-        this.message = ( "Error: You need to specify an address" );
+    constructor() {
+        super();
+        this.message = "Error: You need to specify an address";
     }
 }
 
 class UsernameIsEmptyError extends Error {
-    constructor( message ) {
-        super( message );
-        this.message = ( [ "This isn't a valid ID.", "Try: login id@pass" ] );
+    constructor() {
+        super();
+        this.message = "Empty user name provided";
+    }
+}
+
+class InvalidCredsSyntaxError extends Error {
+    constructor() {
+        super();
+        this.message = "Invalid syntax for credentials provided: either provide just a username, or username:password";
+    }
+}
+
+class InvalidPasswordError extends Error {
+    constructor( userName ) {
+        super();
+        this.message = `Invalid password provided for ${ userName }`;
     }
 }
 
 class MailServerIsEmptyError extends Error {
-    constructor( message ) {
-        super( message );
-        this.message = ( "There is no new mail registered." );
-    }
-}
-
-class LoginIsFalseError extends Error {
-    constructor( message ) {
-        super( message );
-        this.message = ( "You are not logged in." );
+    constructor() {
+        super();
+        this.message = "There is no new mail registered.";
     }
 }
 
 class InvalidMessageKeyError extends Error {
-    constructor( message ) {
-        super( message );
-        this.message = ( "Invalid message key." );
+    constructor() {
+        super();
+        this.message = "Invalid message key.";
     }
 }
 
-class AddressDuplicatedError extends Error {
-    constructor( message ) {
-        super( message );
-        this.message = ( `You already is at ${ message }.` );
+class AlreadyOnServerError extends Error {
+    constructor( serverAddress ) {
+        super();
+        this.message = `You already are at ${ serverAddress }`;
+    }
+}
+
+class UnknownUserError extends Error {
+    constructor( userName ) {
+        super();
+        this.message = `Unknown user ${ userName }`;
+    }
+}
+
+class ServerRequireUsernameError extends Error {
+    constructor( serverAddress ) {
+        super();
+        this.message = `Server require a username to be accessed: ssh username@${ serverAddress }`;
     }
 }
 
 class JsonFetchParseError extends Error {
     constructor( message ) {
-        super( message );
+        super();
         this.message = message;
     }
 }

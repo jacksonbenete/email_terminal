@@ -21,11 +21,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `help` now also lists custom `software` programs (unless they have `secretCommand` set)
 
 ### Changed
+- a new system `ssh` command replaces the old `telnet` + `login` system.
+  This avoids strange states where a user could be logged anonymously on a server.
 - ⚠️ `software` programs are now defined in a single `software.json` file,
   in order to allow their enumeration for tab-completion & `help` output
 
 ### Fixed
 - `delayed` configuration entry for `software` programs is now working correctly
+
+### Deprecated
+- `telnet` & `logout` system commands
 
 
 ## 2020 Apr 4
