@@ -20,13 +20,6 @@ function rot13( s ) { // cf. https://en.wikipedia.org/wiki/ROT13
     return s.replace( /[a-zA-Z]/g, ( c ) => String.fromCharCode( ( c <= "Z" ? 90 : 122 ) >= ( c = c.charCodeAt( 0 ) + 13 ) ? c : c - 26 ) );
 }
 
-function identify() {
-    const introMsg = [ "What is this?", `<img src="https://thisartworkdoesnotexist.com/?${ performance.now() }" style="width: 10rem; max-width: 100%;">` ];
-    return { message: introMsg, onInput( answer ) {
-        return `Wrong! This is not "${ answer }"`;
-    } };
-}
-
 function artifact( args ) {
     if ( args.length === 0 ) {
         return [ "<p>An ID must be provided: <code>artifact $id</code></p>", `You currently have access to the following artifacts: ${ Object.keys( DWEETS ).join( " " ) }` ];
