@@ -35,5 +35,8 @@
     },
     "artifact": {},
     "decrypt": {},
-    "identify": {}
+    "identify": {
+        "secretCommand": true,
+        "protection": ["noone"],
+    }
 }
