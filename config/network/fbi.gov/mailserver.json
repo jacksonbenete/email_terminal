@@ -11,5 +11,26 @@
         "to": ["ACallahan"],
         "title": "DID YOU SEE IT",
         "body": "Oh my god how did they lose it? And worst of all, to the god damn mariners.  Don't tell Russ I said this, but Rodriguez is a hell of a short stop.  Far too good for that rinky dink operation at least.  Anyway, let me know when you've got the Westchester files, I'll need eyes on before Thursday. JM"
+    },
+
+    {
+        "from": "Campbell",
+        "to": ["ACallahan"],
+        "title": "Call me",
+        "body": "Alex, call me - something's not right... comms chatter seems off and OPSEC is asking the wrong questions.   It could be nothing, but this feels like Khartoum all over again"
+    },
+
+    {
+        "from": "Campbell",
+        "to": ["ACallahan"],
+        "title": "Get out now",
+        "body": "Alex get out now, I don't know why your phone is off but get out now, you don't have time anymore, he's there, HE IS THERE"
+    },
+
+    {
+        "from": "deleted",
+        "to": ["ACallahan"],
+        "title": "deleted",
+        "body": "<message rescinded>"
     }
 ]
