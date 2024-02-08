@@ -4,5 +4,12 @@
         "to": ["ACallahan", "user"],
         "title": "Maintenance in all servers",
         "body": "This message is for all divisions of the bureau.  Starting today, the servers may suffer instability due to the latest maintenance measures. Please back up key docs.   admin"
+    },
+
+    {
+        "from": "Miller, Jim",
+        "to": ["ACallahan"],
+        "title": "DID YOU SEE IT",
+        "body": "Oh my god how did they lose it? And worst of all, to the god damn mariners.  Don't tell Russ I said this, but Rodriguez is a hell of a short stop.  Far too good for that rinky dink operation at least.  Anyway, let me know when you've got the Westchester files, I'll need eyes on before Thursday. JM"
     }
 ]
