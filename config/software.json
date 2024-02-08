@@ -34,9 +34,6 @@
             "<img src=\"https://thispersondoesnotexist.com/image\" title=\"tHeY aRe NoT hUmAn\" style=\"width: 10rem; max-width: 100%;\">"
         ]
     },
-    "artifact": {
-        "secretCommand": true,
-        
-    },
+    "artifact": {},
     "decrypt": {}
 }
