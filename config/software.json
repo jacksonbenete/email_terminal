@@ -2,7 +2,6 @@
     "demo.exe": {
         "help": "Demonstrate some rendering features",
         "clear": true,
-        "secretCommand": true,
         "message": [
             "<p class=glow style='font-size: 3em'>⚠ ACHTUNG ⚠</p>",
             "<p class=desync>SHADY TROUBLING MESSAGE</p>",
