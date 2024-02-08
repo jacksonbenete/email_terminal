@@ -11,7 +11,7 @@
 
 function decrypt( args ) { // The same function can be used to encode text
     if ( args.length === 0 ) {
-        return "<p>Some encrypted text must be provided</p>";
+        return "<p>Some encrypted text must be provided: <code>decrypt text</code></p>";
     }
     const textInClear = rot13( args.join( " " ) );
     return `<p class="hack-reveal">${ textInClear }</p>`;
