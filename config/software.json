@@ -28,6 +28,7 @@
     },
     "target.exe": {
         "location": ["127.0.0.1", "localhost"],
+        "secretCommand": true,
         "message": [
             "This <abbr title=\"tHeY aRe NoT hUmAn\"><s>person</s></abbr> is your target:",
             "<img src=\"https://thispersondoesnotexist.com/image\" title=\"tHeY aRe NoT hUmAn\" style=\"width: 10rem; max-width: 100%;\">"
