@@ -23,11 +23,11 @@ function glitchImage( imgElem ) { /* eslint-disable-line no-unused-vars */
                 Object.values( imgElem.style ).forEach( ( prop ) => {
                     canvas.elt.style[ prop ] = imgElem.style[ prop ];
                 } );
-                if (imgElem.height) {
-                    canvas.elt.style.height = `${imgElem.height}px`;
+                if ( imgElem.height ) {
+                    canvas.elt.style.height = `${ imgElem.height }px`;
                 }
-                if (imgElem.width) {
-                    canvas.elt.style.width = `${imgElem.width}px`;
+                if ( imgElem.width ) {
+                    canvas.elt.style.width = `${ imgElem.width }px`;
                 }
                 const glitch = new Glitch( loadedImg, sketch );
                 imgElem.remove();

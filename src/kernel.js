@@ -6,15 +6,15 @@ let userList = [];
 let mailList = [];
 let cmdLine_;
 let output_;
-let serverDate = {day: "", month: "", year: "", reference: ""};
+let serverDate = { day: "", month: "", year: "", reference: "" };
 
 function initDateObject() {
-  const date = new Date();
-  let day = serverDatabase.day ? serverDatabase.day : date.getDate();
-  let month = serverDatabase.month ? serverDatabase.month : date.getMonth() + 1;
-  let year = serverDatabase.year ? serverDatabase.year : date.getFullYear();
-  let reference = serverDatabase.reference ? serverDatabase.reference : "(Solar System Standard Time)"
-  serverDate = {day: day, month: month, year: year, reference: reference}
+    const date = new Date();
+    const day = serverDatabase.day ? serverDatabase.day : date.getDate();
+    const month = serverDatabase.month ? serverDatabase.month : date.getMonth() + 1;
+    const year = serverDatabase.year ? serverDatabase.year : date.getFullYear();
+    const reference = serverDatabase.reference ? serverDatabase.reference : "(Solar System Standard Time)";
+    serverDate = { day, month, year, reference };
 }
 
 function debugObject( obj ) {
@@ -36,12 +36,15 @@ function setHeader( msg = "⠀" ) {
     const promptText = `[${ userDatabase.userName }@${ serverDatabase.terminalID }] # `;
 
     initDateObject();
-    const dateStr = serverDate.day + "/" + serverDate.month + "/" + serverDate.year;
+    const dateStr = `${ serverDate.day }/${ serverDate.month }/${ serverDate.year }`;
+    const imgUrl = `config/network/${ serverDatabase.serverAddress }/${ serverDatabase.iconName }`;
+    const imgSize = serverDatabase.iconSize || 100;
     const header = `
-    <img src="config/network/${ serverDatabase.serverAddress }/${ serverDatabase.iconName }"
-         width="100" height="100" style="float: left; padding: 0px 10px 20px 0px" class="${serverDatabase.iconClass || ''}">
+    <img src="${ imgUrl }" width="${ imgSize }" height="${ imgSize }"
+         style="float: left; padding-right: 10px" class="${ serverDatabase.iconClass || "" }">
     <h2 style="letter-spacing: 4px">${ serverDatabase.serverName }</h2>
     <p>Logged in: ${ serverDatabase.serverAddress } ( ${ dateStr } ) </p>
+    ${ serverDatabase.headerExtraHTML || "" }
     <p>Enter "help" for more information.</p>
     `;
     // Clear content:
@@ -50,7 +53,7 @@ function setHeader( msg = "⠀" ) {
     if ( term ) {
         term.loadHistoryFromLocalStorage( serverDatabase.initialHistory );
     }
-    output( [ header, msg ] ).then(() => applySFX( $( "output img" )[0] ) );
+    output( [ header, msg ] ).then( () => applySFX( $( "output img" )[ 0 ] ) );
     $( ".prompt" ).html( promptText );
 }
 
@@ -173,7 +176,7 @@ function kernel( app, args ) {
     if ( systemApp ) {
         const appDisabled = allowedSoftwares()[ app ] === null;
         if ( appDisabled ) {
-            return Promise.reject(new CommandNotFoundError( app ));
+            return Promise.reject( new CommandNotFoundError( app ) );
         }
         return systemApp( args );
     }
@@ -227,7 +230,8 @@ kernel.connectToServer = function connectToServer( serverAddress, userName, pass
             } else {
                 reject( new ServerRequireUsernameError( serverAddress ) );
             }
-        } ).fail( () => {
+        } ).fail( ( ...args ) => {
+            console.error( "[connectToServer] Failure:", args );
             reject( new AddressNotFoundError( serverAddress ) );
         } );
     } );
@@ -249,14 +253,14 @@ kernel.init = function init( cmdLineContainer, outputContainer ) {
         $.when(
             $.get( "config/software.json", ( softwareData ) => {
                 softwareInfo = softwareData;
-                kernel.connectToServer( defaultServerAddress )
-            } ),
+                kernel.connectToServer( defaultServerAddress );
+            } )
         )
             .done( () => {
                 resolve( true );
             } )
             .fail( ( err, msg, details ) => {
-                console.error( err, msg, details );
+                console.error( "[init] Failure:", err, msg, details );
                 reject( new JsonFetchParseError( msg ) );
             } );
     } );
@@ -299,9 +303,9 @@ system = {
 
     date() {
         return new Promise( ( resolve ) => {
-            let date = new Date();
-            let time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
-            resolve( String( serverDate.month + " " + serverDate.day + " " + serverDate.year + " " + time + " " + serverDate.reference ) );
+            const date = new Date();
+            const time = `${ date.getHours() }:${ date.getMinutes() }:${ date.getSeconds() }`;
+            resolve( String( `${ serverDate.month } ${ serverDate.day } ${ serverDate.year } ${ time } ${ serverDate.reference }` ) );
         } );
     },
 
