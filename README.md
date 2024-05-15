@@ -55,6 +55,14 @@ You can now show further help instructions for internal commands.
 ---
 ![Help v1](docs/help.gif)
 
+## Quick launch
+
+The following command will launch a HTTP server serving the project files:
+
+```node
+npm start
+```
+
 ## How to Configure
 
 You can upload it to Github Pages or try it on your computer. 
@@ -397,16 +405,6 @@ Note that you can create multiple repositories and name those repositories in th
 - etc
 
 You just need to share the correct link with your players and wait for them to read the clues and investigate.
-
-### How to Configure for localhost
-
-If you're testing this on your computer, you'll need to install a HTTP server because isn't possible to open and run files for security reasons. You need that for the AJAX to work to access the database file. It will work without problems once it is forked and running as a Github Page.
-
-```node
-npm install http-server -g
-```
-
-Run it as `http-server C:\location\to\app` or just `http-server` if you're inside the directory. You can access it on `127.0.0.1:8080` in your browser. If you're debugging it, consider going to "Network" in the Inspector and disabling the cache.
 
 ## Future of the Project
 

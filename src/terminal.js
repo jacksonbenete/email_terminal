@@ -180,9 +180,6 @@ function Terminal() {
      * This will automatically output the header when the object initialize (constructor?).
      */
     return {
-        init() {
-            setHeader();
-        },
         addCmdLineListeners,
         removeCmdLineListeners,
         loadHistoryFromLocalStorage,
@@ -198,6 +195,5 @@ $( () => {
     kernel.init( "#input-line .cmdline", "#container output" )
         .then( () => {
             term = new Terminal();
-            term.init();
         } );
 } );

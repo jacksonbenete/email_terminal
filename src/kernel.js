@@ -1,4 +1,5 @@
 // Global scope variables
+const defaultServerAddress = "localhost";
 let serverDatabase = {};
 let userDatabase = {};
 let userList = [];
@@ -34,10 +35,11 @@ function setHeader( msg = "⠀" ) {
     // Setting correct header icon and terminal name
     const promptText = `[${ userDatabase.userName }@${ serverDatabase.terminalID }] # `;
 
-    initDateObject()
-    const dateStr = serverDate.day + "/" + serverDate.month + "/" + serverDate.year
+    initDateObject();
+    const dateStr = serverDate.day + "/" + serverDate.month + "/" + serverDate.year;
     const header = `
-    <img align="left" src="config/network/${ serverDatabase.serverAddress }/${ serverDatabase.iconName }" width="100" height="100" style="padding: 0px 10px 20px 0px">
+    <img src="config/network/${ serverDatabase.serverAddress }/${ serverDatabase.iconName }"
+         width="100" height="100" style="float: left; padding: 0px 10px 20px 0px" class="${serverDatabase.iconClass || ''}">
     <h2 style="letter-spacing: 4px">${ serverDatabase.serverName }</h2>
     <p>Logged in: ${ serverDatabase.serverAddress } ( ${ dateStr } ) </p>
     <p>Enter "help" for more information.</p>
@@ -48,7 +50,7 @@ function setHeader( msg = "⠀" ) {
     if ( term ) {
         term.loadHistoryFromLocalStorage( serverDatabase.initialHistory );
     }
-    output( [ header, msg ] );
+    output( [ header, msg ] ).then(() => applySFX( $( "output img" )[0] ) );
     $( ".prompt" ).html( promptText );
 }
 
@@ -114,7 +116,7 @@ function outputLinesWithDelay( lines, delayed, resolve ) {
     const line = lines.shift();
     printLine( line );
     if ( lines.length > 0 ) {
-        setTimeout( outputLinesWithDelay, delayed, lines, resolve, delayed );
+        setTimeout( outputLinesWithDelay, delayed, lines, delayed, resolve );
     } else if ( resolve ) {
         resolve();
     }
@@ -132,6 +134,14 @@ function printLine( data ) {
     }
     output_.insertAdjacentHTML( "beforeEnd", data );
     const elemInserted = output_.lastChild;
+    applySFX( elemInserted );
+    const text = elemInserted.textContent.trim();
+    if ( elemInserted.dataset && text ) { // can be undefined if elemInserted is just Text, not an HTMLElement
+        elemInserted.dataset.text = text; // needed for "desync" effect
+    }
+}
+
+function applySFX( elemInserted ) {
     if ( elemInserted.classList ) { // can be undefined if elemInserted is just Text, not an HTMLElement
         if ( elemInserted.classList.contains( "glitch" ) ) {
             glitchImage( elemInserted );
@@ -142,10 +152,6 @@ function printLine( data ) {
         if ( elemInserted.classList.contains( "hack-reveal" ) ) {
             hackRevealText( elemInserted, elemInserted.dataset );
         }
-    }
-    const text = elemInserted.textContent.trim();
-    if ( elemInserted.dataset && text ) { // can be undefined if elemInserted is just Text, not an HTMLElement
-        elemInserted.dataset.text = text; // needed for "desync" effect
     }
 }
 
@@ -165,6 +171,10 @@ function printLine( data ) {
 function kernel( app, args ) {
     const systemApp = system[ app ] || system[ app.replace( ".", "_" ) ];
     if ( systemApp ) {
+        const appDisabled = allowedSoftwares()[ app ] === null;
+        if ( appDisabled ) {
+            return Promise.reject(new CommandNotFoundError( app ));
+        }
         return systemApp( args );
     }
     return software( app, args );
@@ -239,8 +249,8 @@ kernel.init = function init( cmdLineContainer, outputContainer ) {
         $.when(
             $.get( "config/software.json", ( softwareData ) => {
                 softwareInfo = softwareData;
+                kernel.connectToServer( defaultServerAddress )
             } ),
-            kernel.connectToServer( "localhost" )
         )
             .done( () => {
                 resolve( true );
@@ -305,13 +315,18 @@ system = {
         return new Promise( ( resolve ) => {
             const programs = allowedSoftwares();
             if ( args.length === 0 ) {
-                const commands = Object.keys( system ).filter( ( cmd ) => cmd !== "dumpdb" );
-                Array.prototype.push.apply( commands, Object.keys( programs ).filter( ( pName ) => !programs[ pName ].secretCommand ) );
-                commands.sort();
+                const cmdNames = Object.keys( system ).filter(
+                    ( cmd ) => programs[ cmd ] !== null && cmd !== "dumpdb" // hidden system command
+                );
+                const progNames = Object.keys( programs ).filter(
+                    ( pName ) => programs[ pName ] && !programs[ pName ].secretCommand
+                );
+                Array.prototype.push.apply( cmdNames, progNames );
+                cmdNames.sort();
                 resolve( [
                     "You can read the help of a specific command by entering as follows: 'help commandName'",
                     "List of useful commands:",
-                    `<div class="ls-files">${ commands.join( "<br>" ) }</div>`,
+                    `<div class="ls-files">${ cmdNames.join( "<br>" ) }</div>`,
                     "You can navigate in the commands usage history using the UP & DOWN arrow keys.",
                     "The TAB key will provide command auto-completion."
                 ] );
@@ -594,7 +609,9 @@ function allowedSoftwares() {
     const softwares = {};
     for ( const app in softwareInfo ) {
         const program = softwareInfo[ app ];
-        if (
+        if ( program === null ) {
+            softwares[ app ] = null;
+        } else if (
             ( !program.location || program.location.includes( serverDatabase.serverAddress ) ) &&
             ( !program.protection || program.protection.includes( userDatabase.userId ) )
         ) {
