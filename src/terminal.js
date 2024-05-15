@@ -4,6 +4,9 @@
  * Base code created by @AndrewBarfield, further development by @jacksonbenete & @Lucas-C.
  * This should contain all the basic code for the terminal behavior.
  */
+const UP_ARROW_KEYCODE = 38;
+const DOWN_ARROW_KEYCODE = 40;
+
 function Terminal() {
     let history_ = [];
     let histpos_ = 0;
@@ -33,38 +36,35 @@ function Terminal() {
      *
      * You can navigate by pressing the up and down arrow for see or repeat previous commands.
      *
-     * @todo I don't get why the "Up arrow" aren't setting the cursor to end of input
-     *
      * @param {Event} e
      */
     function historyHandler_( e ) {
-        if ( history_.length ) {
-            if ( e.keyCode === 38 || e.keyCode === 40 ) {
-                if ( history_[ histpos_ ] ) {
-                    history_[ histpos_ ] = this.value;
-                } else {
-                    histtemp_ = this.value;
-                }
+        if ( history_.length === 0 || ( e.keyCode !== UP_ARROW_KEYCODE && e.keyCode !== DOWN_ARROW_KEYCODE ) ) {
+            return;
+        }
+        if ( history_[ histpos_ ] ) {
+            history_[ histpos_ ] = this.value;
+        } else {
+            histtemp_ = this.value;
+        }
+        if ( e.keyCode === UP_ARROW_KEYCODE ) {
+            histpos_--;
+            if ( histpos_ < 0 ) {
+                histpos_ = 0;
             }
-
-            if ( e.keyCode === 38 ) { // Up arrow
-                histpos_--;
-                if ( histpos_ < 0 ) {
-                    histpos_ = 0;
-                }
-            } else if ( e.keyCode === 40 ) { // Down arrow
-                histpos_++;
-
-                // This avoid to repeat the history from the beggining
-                if ( histpos_ > history_.length ) {
-                    histpos_ = history_.length;
-                }
-            }
-
-            if ( e.keyCode === 38 || e.keyCode === 40 ) {
-                this.value = history_[ histpos_ ] ? history_[ histpos_ ] : histtemp_;
+        } else if ( e.keyCode === DOWN_ARROW_KEYCODE ) {
+            histpos_++;
+            // This avoid to repeat the history from the beggining
+            if ( histpos_ > history_.length ) {
+                histpos_ = history_.length;
             }
         }
+        this.value = history_[ histpos_ ] ? history_[ histpos_ ] : histtemp_;
+        // Trick to move cursor to end of input, cf. https://stackoverflow.com/a/10576409/636849
+        setTimeout( () => {
+            /* eslint-disable-next-line no-multi-assign */
+            this.selectionStart = this.selectionEnd = 10000;
+        }, 10 );
     }
 
     /**
@@ -137,7 +137,12 @@ function Terminal() {
                         output( result );
                     } )
                     .catch( ( error ) => {
-                        output( error.message );
+                        if ( error.constructor.name === "Error" ) { // untyped = unexpected error
+                            console.exception( error );
+                            output( `kernel failure - ${ error.constructor.name }: ${ error.message }` );
+                        } else {
+                            output( error.message );
+                        }
                     } );
             } catch ( error ) {
                 // If the user enter a empty line, it will just ignore and output a new line

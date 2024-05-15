@@ -16,6 +16,7 @@ You can host it on Github Pages for a free and fast experience and can share the
 <!-- toc -->
 
 - [Latest News](#latest-news)
+- [Quick launch](#quick-launch)
 - [How to Configure](#how-to-configure)
 - [Customization](#customization)
   * [manifest.json](#manifestjson)
@@ -26,7 +27,6 @@ You can host it on Github Pages for a free and fast experience and can share the
   * [History](#history)
   * [Other Functions](#other-functions)
 - [How to Install](#how-to-install)
-  * [How to Configure for localhost](#how-to-configure-for-localhost)
 - [Future of the Project](#future-of-the-project)
 - [Customization / what to do with this](#customization--what-to-do-with-this)
 - [Acknowledgement](#acknowledgement)
@@ -88,7 +88,7 @@ That is, you can't access data of a user configured on `mailserver.json` while y
 The basic configuration at `manifest.json` is what you need to change to customize your terminal.
 You can change the terminal year date, the server name, a customized icon, the terminal identification
 (this is what is written just before the cursor), as well as the default user id and name (normally this will be "user",
-but it can be whatever you want) and if you want a random number to be displayed right in front of the default username (`randomSeed`).
+but it can be whatever you want).
 Note however that, once you login to the server, the username will change.
 
 ```json
@@ -102,8 +102,7 @@ Note however that, once you login to the server, the username will change.
         "userId": "user",
         "password": "",
         "userName": "anonymous"
-    },
-    "randomSeed": true
+    }
 }
 ```
 ---
@@ -120,8 +119,7 @@ Note however that, once you login to the server, the username will change.
         "userId": "user",
         "password": "",
         "userName": "anonymous"
-    },
-    "randomSeed": false
+    }
 }
 ```
 ---
