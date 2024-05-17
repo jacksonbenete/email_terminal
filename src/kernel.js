@@ -5,6 +5,7 @@ let userDatabase = {};
 let userList = [];
 let mailList = [];
 let cmdLine_;
+let history_;
 let output_;
 let serverDate = { day: "", month: "", year: "", reference: "" };
 
@@ -31,7 +32,7 @@ function debugObject( obj ) {
  *
  * @param {String} msg A message to be showed when done
  */
-function setHeader( msg = "⠀" ) {
+function setHeader( msg ) {
     // Setting correct header icon and terminal name
     const promptText = `[${ userDatabase.userName }@${ serverDatabase.terminalID }] # `;
 
@@ -53,7 +54,7 @@ function setHeader( msg = "⠀" ) {
     if ( term ) {
         term.loadHistoryFromLocalStorage( serverDatabase.initialHistory );
     }
-    output( [ header, msg ] ).then( () => applySFX( $( "output img" )[ 0 ] ) );
+    output( [ header, msg ] ).then( () => applySFX() );
     $( ".prompt" ).html( promptText );
 }
 
@@ -132,30 +133,32 @@ function outputLinesWithDelay( lines, delayed, resolve ) {
  * @param {Object} data information on what to display
  */
 function printLine( data ) {
+    data ||= "";
     if ( !data.startsWith( "<" ) ) {
         data = `<p>${ data }</p>`;
     }
     output_.insertAdjacentHTML( "beforeEnd", data );
-    const elemInserted = output_.lastChild;
-    applySFX( elemInserted );
-    const text = elemInserted.textContent.trim();
-    if ( elemInserted.dataset && text ) { // can be undefined if elemInserted is just Text, not an HTMLElement
-        elemInserted.dataset.text = text; // needed for "desync" effect
-    }
+    applySFX();
 }
 
-function applySFX( elemInserted ) {
-    if ( elemInserted.classList ) { // can be undefined if elemInserted is just Text, not an HTMLElement
-        if ( elemInserted.classList.contains( "glitch" ) ) {
-            glitchImage( elemInserted );
+function applySFX() {
+    $( output_ ).find( ".desync" ).each( ( _, elem ) => {
+        const text = elem.textContent.trim();
+        if ( text ) {
+            elem.dataset.text = text;
         }
-        if ( elemInserted.classList.contains( "particle" ) ) {
-            particleImage( elemInserted );
-        }
-        if ( elemInserted.classList.contains( "hack-reveal" ) ) {
-            hackRevealText( elemInserted, elemInserted.dataset );
-        }
+    } );
+    $( output_ ).find( "img.glitch" ).filter( once ).each( ( _, img ) => glitchImage( img ) );
+    $( output_ ).find( "img.particle" ).filter( once ).each( ( _, img ) => particleImage( img ) );
+    $( output_ ).find( ".hack-reveal" ).filter( once ).each( ( _, elem ) => hackRevealText( elem, elem.dataset ) );
+}
+
+function once( _, elem ) {
+    if ( elem.dataset.marked ) {
+        return false;
     }
+    elem.dataset.marked = true;
+    return true;
 }
 
 /**
@@ -171,16 +174,17 @@ function applySFX( elemInserted ) {
  * @param {String} app The app name
  * @param {Array} args A list of Strings as args
  */
-function kernel( app, args ) {
-    const systemApp = system[ app ] || system[ app.replace( ".", "_" ) ];
-    if ( systemApp ) {
-        const appDisabled = allowedSoftwares()[ app ] === null;
-        if ( appDisabled ) {
-            return Promise.reject( new CommandNotFoundError( app ) );
-        }
-        return systemApp( args );
+function kernel( appName, args ) {
+    const program = allowedSoftwares()[ appName ];
+    if ( program ) {
+        return software( appName, program, args );
     }
-    return software( app, args );
+    const systemApp = system[ appName ] || system[ appName.replace( ".", "_" ) ];
+    const appDisabled = ( program === null );
+    if ( !systemApp || appDisabled ) {
+        return Promise.reject( new CommandNotFoundError( appName ) );
+    }
+    return systemApp( args );
 }
 
 /**
@@ -320,7 +324,10 @@ system = {
             const programs = allowedSoftwares();
             if ( args.length === 0 ) {
                 const cmdNames = Object.keys( system ).filter(
-                    ( cmd ) => programs[ cmd ] !== null && cmd !== "dumpdb" // hidden system command
+                    ( cmd ) => {
+                        const program = programs[ cmd ];
+                        return program !== null && !( program && program.secretCommand ) && cmd !== "dumpdb"; // hidden system command
+                    }
                 );
                 const progNames = Object.keys( programs ).filter(
                     ( pName ) => programs[ pName ] && !programs[ pName ].secretCommand
@@ -335,13 +342,15 @@ system = {
                     "The TAB key will provide command auto-completion."
                 ] );
             } else if ( args[ 0 ] === "clear" ) {
-                resolve( [ "Usage:", "> clear", "The clear command will completely wipeout the entire screen, but it will not affect the history." ] );
+                resolve( [ "Usage:", "> clear", "The clear command will wipe the content of the terminal, but it will not affect the history." ] );
             } else if ( args[ 0 ] === "date" ) {
                 resolve( [ "Usage:", "> date", "The date command will print the current date-time into terminal." ] );
             } else if ( args[ 0 ] === "echo" ) {
                 resolve( [ "Usage:", "> echo args", "The echo command will print args into terminal." ] );
             } else if ( args[ 0 ] === "help" ) {
-                resolve( [ "Usage:", "> help", "The default help message. It will show some of the available commands in a server." ] );
+                resolve( [ "Usage:", "> help", "The default help message. It will show the commands available on the server." ] );
+            } else if ( args[ 0 ] === "history" ) {
+                resolve( [ "Usage:", "> history", "The history command will list all the commands you alread typed in this terminal." ] );
             } else if ( args[ 0 ] === "login" ) {
                 resolve( [ "Usage:", "> login username:password", "Switch account: log in as another registered user on the server, to access your data files and messages." ] );
             } else if ( args[ 0 ] === "mail" ) {
@@ -400,7 +409,7 @@ system = {
             }
             const matchingUser = userList.find( ( user ) => user.userId === userName );
             if ( !matchingUser ) {
-                reject( new UnknownUserError() );
+                reject( new UnknownUserError( userName ) );
                 return;
             }
             if ( matchingUser.password && matchingUser.password !== passwd ) {
@@ -425,49 +434,39 @@ system = {
         } );
     },
 
+    history() {
+        return new Promise( ( resolve ) => {
+            const messageList = history_.map( ( line, i ) => `[${ i }] ${ line }` );
+            resolve( messageList );
+        } );
+    },
+
     mail() {
         return new Promise( ( resolve, reject ) => {
-            const messageList = [];
-
-            $.each( mailList, ( index, mail ) => {
-                if ( mail.to.includes( userDatabase.userId ) ) {
-                    messageList.push( `[${ index }] ${ mail.title }` );
-                }
-            } );
-
-            if ( messageList === "" ) {
+            const messageList = mailList.filter( ( mail ) => mail.to.includes( userDatabase.userId ) )
+                .map( ( mail, i ) => `[${ i }] ${ mail.title }` );
+            if ( messageList.length === 0 ) {
                 reject( new MailServerIsEmptyError() );
                 return;
             }
-
             resolve( messageList );
         } );
     },
 
     read( args ) {
         return new Promise( ( resolve, reject ) => {
-            const message = [];
-
-            let readOption = false;
-            $.each( mailList, ( index, mail ) => {
-                if ( mail.to.includes( userDatabase.userId ) && Number( args[ 0 ] ) === index ) {
-                    readOption = true;
-                    message.push( "---------------------------------------------" );
-                    message.push( `From: ${ mail.from }` );
-                    message.push( `To: ${ userDatabase.userId }@${ serverDatabase.terminalID }` );
-                    message.push( "---------------------------------------------" );
-
-                    $.each( mail.body.split( "  " ), ( _, line ) => {
-                        message.push( line );
-                    } );
-                }
-            } );
-
-            if ( !readOption ) {
+            const mailIndex = Number( args[ 0 ] );
+            const mailAtIndex = mailList[ mailIndex ];
+            if ( !mailAtIndex || !mailAtIndex.to.includes( userDatabase.userId ) ) {
                 reject( new InvalidMessageKeyError() );
                 return;
             }
-
+            let message = [];
+            message.push( "---------------------------------------------" );
+            message.push( `From: ${ mailAtIndex.from }` );
+            message.push( `To: ${ userDatabase.userId }@${ serverDatabase.terminalID }` );
+            message.push( "---------------------------------------------" );
+            message = [ ...message, ...mailAtIndex.body.split( "  " ) ];
             resolve( message );
         } );
     },
@@ -539,9 +538,8 @@ function userPasswordFrom( creds ) {
  * @param {String} progName The software name
  * @param {String} args Args to be handled if any
  */
-function software( progName, args ) {
+function software( progName, program, args ) {
     return new Promise( ( resolve, reject ) => {
-        const program = allowedSoftwares()[ progName ];
         if ( program ) {
             if ( program.clear ) {
                 system.clear().then( runSoftware( progName, program, args ).then( resolve, reject ) );
@@ -567,7 +565,7 @@ function runSoftware( progName, program, args ) {
         if ( program.message ) {
             msg = { text: program.message, delayed: program.delayed };
         } else {
-            msg = window[ progName ]( args );
+            msg = window[ progName ]( args ) || "";
             if ( msg.constructor === Object ) {
                 if ( !msg.onInput ) {
                     throw new Error( "An onInput callback must be defined!" );
@@ -638,16 +636,20 @@ const C = Math.cos;
 const S = Math.sin;
 const T = Math.tan;
 
-function dweet( u, width, height ) {
+let lastDweetId = 0;
+function dweet( u, width, height, delay, style ) {
     width = width || 200;
     height = height || 200;
-    const id = Date.now().toString( 36 );
+    delay = delay || 0;
+    style = style || "";
+    const id = ++lastDweetId;
     let frame = 0;
     let nextFrameMs = 0;
     function loop( frameTime ) {
         frameTime = frameTime || 0;
         const c = document.getElementById( id );
         if ( !c ) {
+            console.log( `Stopping dweet rendering: no element with id=${ id } found` );
             return;
         }
         requestAnimationFrame( loop );
@@ -668,8 +670,8 @@ function dweet( u, width, height ) {
         x.clearRect( 0, 0, width, height ); // clear canvas
         u( time, x, c );
     }
-    setTimeout( loop, 50 ); // Small delay to let time for the canvas to be inserted
-    return `<canvas id="${ id }" width="${ width }" height="${ height }">`;
+    setTimeout( loop, delay + 50 ); // Minimal small delay to let time for the canvas to be inserted
+    return `<canvas id="${ id }" width="${ width }" height="${ height }" style="${ style }">`;
 }
 
 function R( r, g, b, a ) {

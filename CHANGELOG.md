@@ -11,10 +11,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - new example software programs: `demo.exe`, `target.exe`, `artifact`, `decrypt` & `identify`
+- new kernel commands: `echo`, `exit`, `history`
 - `software` programs logic can now be defined as Javascript code in `software.js`
 - `software` programs `messages` can now include **images** 🖼️, with an optional `glitch` / `particule` effect
 - `software` programs `messages` can now include text with an optional effects:
   `desync`, `shimmer`, `glow` or `hack-reveal`.
+- new supported configurations fields in `manifest.json` : `iconSize`, `iconClass`, `headerExtraHTML`
 - storing the commands history in the browser `localStorage`
 - allowing to configure the initial content of a user commands history
 - tab-completion of command names
