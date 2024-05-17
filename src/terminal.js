@@ -7,10 +7,11 @@
 const UP_ARROW_KEYCODE = 38;
 const DOWN_ARROW_KEYCODE = 40;
 
+let FunctionalError;
+let history_ = [];
+let histpos_ = 0;
+
 function Terminal() {
-    let history_ = [];
-    let histpos_ = 0;
-    let histtemp_ = 0;
     loadHistoryFromLocalStorage();
     addCmdLineListeners();
 
@@ -42,10 +43,11 @@ function Terminal() {
         if ( history_.length === 0 || ( e.keyCode !== UP_ARROW_KEYCODE && e.keyCode !== DOWN_ARROW_KEYCODE ) ) {
             return;
         }
+        let histTemp = 0;
         if ( history_[ histpos_ ] ) {
             history_[ histpos_ ] = this.value;
         } else {
-            histtemp_ = this.value;
+            histTemp = this.value;
         }
         if ( e.keyCode === UP_ARROW_KEYCODE ) {
             histpos_--;
@@ -59,7 +61,7 @@ function Terminal() {
                 histpos_ = history_.length;
             }
         }
-        this.value = history_[ histpos_ ] ? history_[ histpos_ ] : histtemp_;
+        this.value = history_[ histpos_ ] ? history_[ histpos_ ] : histTemp;
         // Trick to move cursor to end of input, cf. https://stackoverflow.com/a/10576409/636849
         setTimeout( () => {
             /* eslint-disable-next-line no-multi-assign */
@@ -137,11 +139,11 @@ function Terminal() {
                         output( result );
                     } )
                     .catch( ( error ) => {
-                        if ( error.constructor.name === "Error" ) { // untyped = unexpected error
+                        if ( error instanceof FunctionalError ) {
+                            output( error.message );
+                        } else { // untyped = unexpected error
                             console.exception( error );
                             output( `kernel failure - ${ error.constructor.name }: ${ error.message }` );
-                        } else {
-                            output( error.message );
                         }
                     } );
             } catch ( error ) {
