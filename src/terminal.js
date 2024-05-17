@@ -7,7 +7,6 @@
 const UP_ARROW_KEYCODE = 38;
 const DOWN_ARROW_KEYCODE = 40;
 
-let FunctionalError;
 let history_ = [];
 let histpos_ = 0;
 
@@ -139,7 +138,7 @@ function Terminal() {
                         output( result );
                     } )
                     .catch( ( error ) => {
-                        if ( error instanceof FunctionalError ) {
+                        if ( error instanceof FunctionalError ) { // eslint-disable-line no-undef
                             output( error.message );
                         } else { // untyped = unexpected error
                             console.exception( error );
