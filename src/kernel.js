@@ -5,7 +5,6 @@ let userDatabase = {};
 let userList = [];
 let mailList = [];
 let cmdLine_;
-let history_;
 let output_;
 let serverDate = { day: "", month: "", year: "", reference: "" };
 
@@ -436,7 +435,7 @@ system = {
 
     history() {
         return new Promise( ( resolve ) => {
-            const messageList = history_.map( ( line, i ) => `[${ i }] ${ line }` );
+            const messageList = history_.map( ( line, i ) => `[${ i }] ${ line }` ); // eslint-disable-line no-undef
             resolve( messageList );
         } );
     },
