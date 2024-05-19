@@ -43,7 +43,7 @@ function setHeader( msg ) {
     <img src="${ imgUrl }" width="${ imgSize }" height="${ imgSize }"
          style="float: left; padding-right: 10px" class="${ serverDatabase.iconClass || "" }">
     <h2 style="letter-spacing: 4px">${ serverDatabase.serverName }</h2>
-    <p>Logged in: ${ serverDatabase.serverAddress } ( ${ dateStr } ) </p>
+    <p>Logged in: ${ serverDatabase.serverAddress } (&nbsp;${ dateStr }&nbsp;) </p>
     ${ serverDatabase.headerExtraHTML || "" }
     <p>Enter "help" for more information.</p>
     `;

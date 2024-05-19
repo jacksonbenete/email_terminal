@@ -14,11 +14,6 @@ function Terminal() {
     loadHistoryFromLocalStorage();
     addCmdLineListeners();
 
-    // Recover focus on terminal
-    window.addEventListener( "click", () => {
-        cmdLine_.focus();
-    } );
-
     function addCmdLineListeners() {
         cmdLine_.addEventListener( "keydown", historyHandler_ );
         cmdLine_.addEventListener( "keydown", processNewCommand_ );
