@@ -1,7 +1,7 @@
-{
+    `{
     "serverAddress": "localhost",
     "serverName": "Red Scorpion Intranet",
-    "iconName": "Moon-icon.png",
+    "iconName": "config/network/localhost/Scorps Red png logo.png",
     "terminalID": "MIDWAY TERM1",
     "defaultUser": {
         "userId": "user",
