@@ -1,19 +1,19 @@
 {
     "serverAddress": "localhost",
-    "serverName": "Node Y56 Intranet",
+    "serverName": "Red Scorpion Intranet",
     "iconName": "Moon-icon.png",
     "terminalID": "Y56",
     "defaultUser": {
         "userId": "user",
-        "password": "",
-        "userName": "anonymous"
+        "password": "******",
+        "userName": "ILOVEBIGTITTIES"
     },
     "initialHistory": {
         "user": [
             "login admin@admin"
         ],
         "admin": [
-            "ping fbi.gov"
+            "ping 8.1.4.1 [JOHNNY'S TERMINAL]"
         ]
     }
 }
